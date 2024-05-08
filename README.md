@@ -64,7 +64,7 @@ The two internal OPAMPs are used in configuration of instrumental amplifier with
 
 The sinusoidal waveform is generated using on-chip Digital-to-Analog Converter (DAC1). The coresponding waveform values are stored into the Flash Program memory (const uint16_t wave_ROM_250[250]). To ensure precise timing for each sample, a DMA channel (DMA2) triggered by a periodic timer (TMR0) is used to transfer data from the sine table to DAC1. The generated signal frequency can easily be modified by changing the TMR0 period as below:
 
-<img src="images/sine_freq_formula.png" width="130">
+<br><img src="images/sine_freq_formula.png" width="130">
 
 The sine wave frequency can be modified using the *FREQ* define. The possible values are between 50 Hz and 1 KHz. For better results, it is recommended to use lower frequency (e.g. 100 Hz) for capacitance measurement and higher frequency for inductance.
 
