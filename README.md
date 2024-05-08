@@ -4,8 +4,8 @@
 
 # RLC Meter Using the PIC18F56Q71 Microcontroller with MCC Melody
 
-This repository contains a MPLAB® X project, a LCR meter implementation using the internal resources of PIC18F56Q71 microcontroller.  
-In this code example, the PIC18F56Q71 microcontroller will be used to implement a RLC meter using the Operational Amplifier (OPAMP), Analog-to-Digital Converter with Computation and Context (ADCCC), Direct Memory Access (DMA), Timers (TMR0, TMR4) and CLC peripherals. The sinusoidal waveform is generated using the 10-bit Digital-to-Analog Converter (DAC) and other peripherals on the device (DMA, timers). The measurement will be displayed using serial protocols.
+This repository contains an MPLAB® X project, a Resistance, Inductance, Capacitance (RLC) meter implementation using the internal resources of PIC18F56Q71 microcontroller.  
+In this code example, the PIC18F56Q71 microcontroller will be used to implement a RLC meter using the Operational Amplifier (OPAMP), Analog-to-Digital Converter (ADC) with Computation and Context, Direct Memory Access (DMA), Timers (TMR0, TMR4) and Configurable Logic Cell (CLC) peripherals. The sinusoidal waveform is generated using the 10-bit Digital-to-Analog Converter (DAC) and other peripherals on the device (DMA, timers). The measurement will be displayed using serial protocols.
 
 Note: This project is not an measurement instrument, it was developed only for educational purpose.
 
@@ -39,40 +39,40 @@ To program the Curiosity Nano board with this MPLAB X project, follow the steps 
 
 ## Concept
 
-LCR meters are measuring instruments that measure a physical property known as impedance. Impedance, which is expressed using the quantifier Z, indicates resistance to the flow of an AC current. It can be calculated from the current I flowing to the measurement target and the voltage V across the target’s terminals. Since impedance is expressed as a vector on a complex plane, LCR meters measure not only the ratio of current and voltage RMS values, but also the phase difference between current and voltage waveforms. The result of the measurement is displayed using a LCD display or an USB-to-TTL converter connected to UART2 peripheral.
+RLC meters are measuring instruments that measure a physical property known as impedance. Impedance, which is expressed using the quantifier Z, indicates resistance to the flow of an alternating current (AC). It can be calculated from the current (I) flowing to the measurement target and the voltage (V) across the target’s terminals. Since impedance is expressed as a vector on a complex plane, LCR meters measure not only the ratio of current and voltage RMS values, but also the phase difference between current and voltage waveforms. The result of the measurement is displayed using an LCD display or an USB-to-TTL converter connected to UART2 peripheral.
 
-### Measurement principle
+### Measurement Principle
 
 There are different methods used to measure the impedance, each of them with advantages and disadvantages:
-- Automatic balanced bridge
+- Auto-Balancing Bridge Method
 - Resonant Method
 - I-V Method
 
-For this demo, the automatic balanced bridge is used, a circuit that is used in many LCR meters as the measurement circuit. The circuit has four terminals, all of which are connected to the measurement target. 
+This demo uses an auto-balancing bridge which is the measurement circuit in many RLC meters. The circuit has four terminals, all of which are connected to the measurement target. 
 
-In the following picture is represented the concept used for this application. The OPAMPs used in this case are external. The second OPAMP is used to implement the automatic balanced bridge that was mentioned above. The principle behind this method is to determine the impedance by measuring the current and voltage.
+The following image shows the concept used for this application. The OPAMPs used in this case are external. The second OPAMP is used to implement the automatic balanced bridge that was mentioned above. The principle behind this method is to determine the impedance by measuring the current and voltage.
 
-- <br><img src="images/lc_meter_concept_diagram.png" width="1000">
+<br><img src="images/lc_meter_concept_diagram.png" width="1000">
 
-There is a MCU internal multiplexor that is used to select between the current and voltage aquisition. For an impedence measurement, the two of those aquisitions are performed starting with the voltage one. For both of them, the samples are saved in different buffers using DMA1/DMA3 peripherals. After that, the data is processed by multiplying with cosinus, respectively sinus values in order to calculate the real and imaginary parts for voltage and current.
+There is an MCU internal multiplexor that is used to select between the current and voltage aquisition. For an impedance measurement, two of those aquisitions are performed starting with the voltage one. For both of them, the samples are saved in different buffers using DMA1/DMA3 peripherals. To calculate the real and imaginary parts for voltage and current, the processed data is mutiplied by cosinus wave and sinus wave, respectively.
 
-- <br><img src="images/aquisition_diagram.png" width="1000">
+<br><img src="images/aquisition_diagram.png" width="1000">
 
-The two internal OPAMPs are used in configuration of instrumental amplifier with programmable gain. An autogain algorithm is used when a new component is inserted in order to independently determine the right gain for voltage and current measurements. The principle is to adjust the gain in order to obtain the maximum amplification that not saturates the output. The maximum value for voltage is determine when the device under test (DUT) is not connected and for the current by measuring in short. The minimum values are calculated as 20% of maximum. All results are previously determined and stored in defines.
+The two internal OPAMPs are used in configuration of instrumental amplifier with programmable gain. An autogain algorithm is used when a new component is inserted to independently determine the right gain for voltage and current measurements. The principle is to adjust the gain in order to obtain the maximum amplification that does not saturate the output. The maximum value for voltage is determined when the device under test (DUT) is not connected and for the current by measuring in short circuit. The minimum values represent 20% of the maximum value. All results are previously determined and stored in defines.
 
-### Sinusoidal waveform generation
+### Sinusoidal Waveform Generation
 
-The sinusoidal waveform is generated using on-chip Digital-to-Analog Converter (DAC1). The coresponding waveform values are stored into the Flash Program memory (const uint16_t wave_ROM_250[250]). To ensure precise timing for each sample, a DMA channel (DMA2) triggered by a periodic timer (TMR0) is used to transfer data from sine table to DAC1. The generated signal frequency can easily be modified by changing the TMR0 period as below:
+The sinusoidal waveform is generated using on-chip Digital-to-Analog Converter (DAC1). The coresponding waveform values are stored into the Flash Program memory (const uint16_t wave_ROM_250[250]). To ensure precise timing for each sample, a DMA channel (DMA2) triggered by a periodic timer (TMR0) is used to transfer data from the sine table to DAC1. The generated signal frequency can easily be modified by changing the TMR0 period as below:
 
-$F = TMR0\_Frequency\ /\ SinTable\_steps$
+<img src="images/sine_freq_formula.png" width="130">
 
 The sine wave frequency can be modified using the *FREQ* define. The possible values are between 50 Hz and 1 KHz. For better results, it is recommended to use lower frequency (e.g. 100 Hz) for capacitance measurement and higher frequency for inductance.
 
-### Synchronisation between generated signal and data aquired
+### Synchronization Between the Generated Signal and the Data Acquired
 
-To allow accurate values for computed impedance, the aquisition of the samples for current and voltage must be synchronized with input signal (generated waveform). The synchronisation between generated waveform and aquired samples is done using on-chip peripherals (CLCs, PWMs and timers):
+To allow accurate values for computed impedance, the aquisition of the samples for current and voltage must be synchronized with input signal (generated waveform). The synchronization between generated waveform and aquired samples is done using on-chip peripherals like CLCs, Pulse-Width Modulation (PWM) and timers:
 
-- <br><img src="images/logic_diagram.png" width="1000">
+<br><img src="images/logic_diagram.png" width="1000">
  
 ## Setup 
 
@@ -294,7 +294,7 @@ The following peripheral and clock configurations are set up using the MPLAB Cod
     - Enable UART: Enabled
     <br><img src="images/mcc_uart2_plib.png" width="600">
 
-In the next table there are presented the LCD connections:
+The following table shows the LCD connections:
 
 |     **Pin**      |  **Connection**   |  **Custom Name**  | 
 | :-------:        | :-------:         | :-------:         | 
@@ -311,13 +311,13 @@ In the next table there are presented the LCD connections:
 
 ## Demo
 
-In order to demonstrate the capabilities of this application, a 3.3uF capacitor measurement was performed. The result can be seen in the following picture.
+In order to demonstrate the capabilities of this application, a 3.3 μF capacitor measurement was performed. The result can be seen in the following picture.
 
 <br><img src="images/capacitor_3u3.jpg" width="600">
 
 ## Summary
 
-This project showcases the PIC18F56Q71 peripherals's capabilities in a measurement application. For this case, the majority of peripherals are used for creating a complex use case.
+This project showcases the PIC18F56Q71 peripherals' capabilities in a measurement application. For this case, the majority of peripherals are used to create a complex use case.
 
 ##  How to Program the Curiosity Nano Board 
 
