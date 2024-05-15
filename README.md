@@ -160,13 +160,7 @@ The following peripheral and clock configurations are set up using the MPLAB Cod
     <br><img src="images/mcc_dma3_2.png" width="600">
     <br><img src="images/mcc_dma3_interrupts.png" width="600">
 
-7. FVR:
-    - Enable FVR: Enabled
-    - FVR buffer gain to ADC: 1x
-    - FVR buffer gain to other peripherals: 2x
-    <br><img src="images/mcc_fvr.png" width="600">
-
-8. DAC1:
+7. DAC1:
     - VDD: 3.3
     - Required ref: 1.024
     - DAC Enable: Enabled
@@ -175,16 +169,7 @@ The following peripheral and clock configurations are set up using the MPLAB Cod
     - DAC Output Enable Selection: DACOUT1 Enabled and DACOUT2 Disabled
     <br><img src="images/mcc_dac1.png" width="600">
 
-9. DAC3:
-    - VDD: 2.048
-    - Required ref: 1.016
-    - DAC Enable: Enabled
-    - DAC Positive reference selection: FVR
-    - DAC Negative reference selection: VSS
-    - DAC Output Enable Selection: DACOUT1 and DACOUT2 are Disabled
-    <br><img src="images/mcc_dac3.png" width="600">
-
-10. ADC:
+8. ADC:
     - ADC: Enabled
     - Input Configuration: differential mode
     - Auto-conversion Trigger Source: CLC3
@@ -196,7 +181,7 @@ The following peripheral and clock configurations are set up using the MPLAB Cod
     - Clock Divider: FOSC/64
     <br><img src="images/mcc_adc.png" width="600">
 
-11. ADC Context 1
+9. ADC Context 1
     - Positive Channel Selection: ANB1
     - Positive Voltage Reference: VDD
     - Negative Channel Selection: ANA1
@@ -212,7 +197,7 @@ The following peripheral and clock configurations are set up using the MPLAB Cod
     <br><img src="images/mcc_adc_context1_1.png" width="600">
     <br><img src="images/mcc_adc_context1_2.png" width="600">
 
-12. TMR0
+10. TMR0
     - Enable Timer: Enabled
     - Timer mode: 8-bit
     - Clock Prescaler: 1:8
@@ -221,7 +206,7 @@ The following peripheral and clock configurations are set up using the MPLAB Cod
     - Requested Period (s): 0.000001
     <br><img src="images/mcc_tmr0.png" width="600">
 
-13. TMR4
+11. TMR4
     - Enable Timer: Enabled
     - Control mode: Roll over pulse
     - External Reset Source: CLC6_out
@@ -233,7 +218,7 @@ The following peripheral and clock configurations are set up using the MPLAB Cod
     - Time Period (s): 0.025
     <br><img src="images/mcc_tmr4.png" width="600">
 
-14. PWM1_16BIT
+12. PWM1_16BIT
     - Enable PWM: Enabled
     - Clock Source: CLC8_OUT
     - Clock Frequency(KHz): 250
@@ -243,44 +228,44 @@ The following peripheral and clock configurations are set up using the MPLAB Cod
     - Output2 Duty Cycle(%): 51
     <br><img src="images/mcc_pwm1.png" width="600">
 
-15. CLC1
+13. CLC1
     - Enable CLC: Enabled
     - Logic Cell Mode bits: AND-OR
     <br><img src="images/mcc_clc1.png" width="600">
 
-16. CLC3
+14. CLC3
     - Enable CLC: Enabled
     - Logic Cell Mode bits: AND-OR
     <br><img src="images/mcc_clc3.png" width="600">
 
-17. CLC6
+15. CLC6
     - Enable CLC: Enabled
     - Logic Cell Mode bits: 1-input D flip-flop with S and R
     <br><img src="images/mcc_clc6.png" width="600">
 
-18. CLC7
+16. CLC7
     - Enable CLC: Enabled
     - Logic Cell Mode bits: 1-input D flip-flop with S and R
     <br><img src="images/mcc_clc7.png" width="600">
 
-19. CLC8
+17. CLC8
     - Enable CLC: Enabled
     - Logic Cell Mode bits: 1-input D flip-flop with S and R
     <br><img src="images/mcc_clc8.png" width="600">
 
-20. SPI1
+18. SPI1
     - Clock Source: FOSC
     - Clock Frequency (Hz): 64000000
     <br><img src="images/mcc_spi1.png" width="600">
 
-21. SPI1_Host
+19. SPI1_Host
     - Config Name: HOST_CONFIG
     - Requested Speed (KHz): 6400
     - Mode: Mode 0
     - Data Input Sample At: Middle
     <br><img src="images/mcc_spi1_host.png" width="600">
 
-22. UART2
+20. UART2
     - Requested Baudrate: 115200
     - Parity: None
     - Data Size: 8
@@ -288,7 +273,7 @@ The following peripheral and clock configurations are set up using the MPLAB Cod
     - Redirect Printf to UART: Enabled
     <br><img src="images/mcc_uart2.png" width="600">
 
-23. UART2 PLIB
+21. UART2 PLIB
     - Enable Receive: Enabled
     - Enable Transmit: Enabled
     - Enable UART: Enabled
@@ -307,7 +292,8 @@ The following table shows the LCD connections:
 |   CS             |     RF3           |     LCD_CS        |  
 |   BLK            |     RF2           |     LCD_BL        | 
 
-
+The figure below shows the schematic of the assembly.
+<br><img src="images/schematic_rlc.png" width="1000">
 
 ## Demo
 
