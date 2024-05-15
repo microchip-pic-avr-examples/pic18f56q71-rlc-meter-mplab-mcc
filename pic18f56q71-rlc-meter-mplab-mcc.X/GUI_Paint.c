@@ -13,11 +13,11 @@
   | Info        :
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documnetation files (the "Software"), to deal
+  of this software and associated documentation files (the "Software"), to deal
   in the Software without restriction, including without limitation the rights
   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to  whom the Software is
-  furished to do so, subject to the following conditions:
+  furnished to do so, subject to the following conditions:
 
   The above copyright notice and this permission notice shall be included in
   all copies or substantial portions of the Software.
@@ -32,6 +32,7 @@
 
 ******************************************************************************/
 #include "GUI_Paint.h"
+#include "font.h"
 #include "mcc_generated_files/spi/spi1.h"
 #include <stdint.h>
 #include <stdlib.h>
@@ -399,38 +400,38 @@ void Paint_DrawCircle(  uint16_t X_Center, uint16_t Y_Center, uint16_t Radius,
     Color_Foreground : Select the foreground color of the English character
 ******************************************************************************/
 void Paint_DrawChar(uint16_t Xpoint, uint16_t Ypoint, const char Acsii_Char,
-                    sFONT* Font, uint16_t Color_Background, uint16_t Color_Foreground)
+                    uint16_t Color_Background, uint16_t Color_Foreground)
 {
 
-  uint16_t Page, Column;
+  int16_t Page, Column;
 
   if (Xpoint > Paint.Width || Ypoint > Paint.Height) {
     printf("Paint_DrawChar Input exceeds the normal display range\r\n");
     return;
   }
-  uint32_t Char_Offset = (Acsii_Char - ' ') * Font->Height * (Font->Width / 8 + (Font->Width % 8 ? 1 : 0));
-  const unsigned char *ptr = &Font->table[Char_Offset];
-
-  for ( Page = 0; Page < Font->Height; Page ++ ) {
-    for ( Column = 0; Column < Font->Width; Column ++ ) {
+  uint32_t Char_Offset = (Acsii_Char - ' ') * FONT_HEIGHT * (FONT_WIDTH / 8 + (FONT_WIDTH % 8 ? 1 : 0));
+  const unsigned char *ptr = &font_table[Char_Offset];
+  
+  for ( Page = 0; Page < 2 * FONT_HEIGHT; Page += 2 ) {
+    for ( Column = 2 * FONT_WIDTH - 2; Column >= 0; Column -= 2 ) {
 
       //To determine whether the font background color and screen background color is consistent
       if (FONT_BACKGROUND == Color_Background) { //this process is to speed up the scan
-        if ((*ptr) & (0x80 >> (Column % 8)))
-          Paint_SetPixel (Xpoint + Column, Ypoint + Page, Color_Foreground );
+        if ((*ptr) & (0x80 >> (Column/2 % 8)))
+            Paint_DrawPoint(Xpoint + Page, Ypoint + Column, Color_Foreground, DOT_PIXEL_2X2, DOT_STYLE_DFT);
       } else {
-        if ((*ptr) & (0x80 >> (Column % 8))) {
-          Paint_SetPixel (Xpoint + Column, Ypoint + Page, Color_Foreground );
+        if ((*ptr) & (0x80 >> (Column/2 % 8))) {
+            Paint_DrawPoint(Xpoint + Page, Ypoint + Column, Color_Foreground, DOT_PIXEL_2X2, DOT_STYLE_DFT);
         } else {
-          Paint_SetPixel (Xpoint + Column, Ypoint + Page, Color_Background );
+            Paint_DrawPoint(Xpoint + Page, Ypoint + Column, Color_Background, DOT_PIXEL_2X2, DOT_STYLE_DFT);
         }
       }
       //One pixel is 8 bits
-      if (Column % 8 == 7) {
+      if (Page % 8 == 7) {
         ptr++;
       }
     }/* Write a line */
-    if (Font->Width % 8 != 0) {
+    if (FONT_HEIGHT % 8 != 0) {
       ptr++;
     }
   }/* Write all */
@@ -447,7 +448,7 @@ void Paint_DrawChar(uint16_t Xpoint, uint16_t Ypoint, const char Acsii_Char,
     Color_Foreground : Select the foreground color of the English character
 ******************************************************************************/
 void Paint_DrawString_EN(uint16_t Xstart, uint16_t Ystart, const char * pString,
-                         sFONT* Font, uint16_t Color_Background, uint16_t Color_Foreground )
+                         uint16_t Color_Background, uint16_t Color_Foreground )
 {
   uint16_t Xpoint = Xstart;
   uint16_t Ypoint = Ystart;
@@ -459,97 +460,23 @@ void Paint_DrawString_EN(uint16_t Xstart, uint16_t Ystart, const char * pString,
 
   while (* pString != '\0') {
     //if X direction filled , reposition to(Xstart,Ypoint),Ypoint is Y direction plus the Height of the character
-    if ((Xpoint + Font->Width ) > Paint.Width ) {
+    if ((Xpoint + FONT_WIDTH ) > Paint.Width ) {
       Xpoint = Xstart;
-      Ypoint += Font->Height;
+      Ypoint += FONT_HEIGHT;
     }
 
     // If the Y direction is full, reposition to(Xstart, Ystart)
-    if ((Ypoint  + Font->Height ) > Paint.Height ) {
+    if ((Ypoint  + FONT_HEIGHT ) > Paint.Height ) {
       Xpoint = Xstart;
       Ypoint = Ystart;
     }
-    Paint_DrawChar(Xpoint, Ypoint, * pString, Font, Color_Background, Color_Foreground);
+    Paint_DrawChar(Xpoint, Ypoint, * pString, Color_Background, Color_Foreground);
 
     //The next character of the address
     pString ++;
 
     //The next word of the abscissa increases the font of the broadband
-    Xpoint += Font->Width;
-  }
-}
-
-
-/******************************************************************************
-  function: Display the string
-  parameter:
-    Xstart           ：X coordinate
-    Ystart           ：Y coordinate
-    pString          ：The first address of the Chinese string and English
-                        string to be displayed
-    Font             ：A structure pointer that displays a character size
-    Color_Background : Select the background color of the English character
-    Color_Foreground : Select the foreground color of the English character
-******************************************************************************/
-void Paint_DrawString_CN(uint16_t Xstart, uint16_t Ystart, const char * pString, cFONT* font, uint16_t Color_Background, uint16_t Color_Foreground)
-{
- const unsigned char* p_text = pString;
-
-  int refcolumn = Xstart;
-  int i, j, Num;
-  /* Send the string character by character on EPD */
-  while (*p_text != 0) {
-    if (*p_text < 0x7F) {                                  //ASCII
-      for (Num = 0; Num < font->size ; Num++) {
-        if (*p_text == (&font->table[Num].index[0])) {
-          const char* ptr = &font->table[Num].matrix[0];
-
-          for (j = 0; j < font->Height; j++) {
-            for (i = 0; i < font->Width; i++) {
-              if ((*ptr) & (0x80 >> (i % 8))) {
-                Paint_SetPixel(refcolumn + i,Ystart + j, Color_Foreground);
-              }
-              if (i % 8 == 7) {
-                ptr++;
-              }
-            }
-            if (font->Width % 8 != 0) {
-              ptr++;
-            }
-          }
-          break;
-        }
-      }
-      /* Point on the next character */
-      p_text += 1;
-      /* Decrement the column position by 16 */
-      refcolumn += font->ASCII_Width;
-    } else {                                   //中文
-      for (Num = 0; Num < font->size ; Num++) {
-        if ((*p_text == (&font->table[Num].index[0])) && (*(p_text + 1) == *(&font->table[Num].index[1])) && (*(p_text + 2) == *(&font->table[Num].index[2]))) {
-          const char* ptr = &font->table[Num].matrix[0];
-
-          for (j = 0; j < font->Height; j++) {
-            for (i = 0; i < font->Width; i++) {
-              if ((*ptr) & (0x80 >> (i % 8))) {
-                Paint_SetPixel(refcolumn + i,Ystart + j, Color_Foreground);
-              }
-              if (i % 8 == 7) {
-                ptr++;
-              }
-            }
-            if (font->Width % 8 != 0) {
-              ptr++;
-            }
-          }
-          break;
-        }
-      }
-      /* Point on the next character */
-      p_text += 3;
-      /* Decrement the column position by 16 */
-      refcolumn += font->Width;
-    }
+    Xpoint += 2 * FONT_WIDTH;
   }
 }
 
@@ -565,7 +492,7 @@ void Paint_DrawString_CN(uint16_t Xstart, uint16_t Ystart, const char * pString,
 ******************************************************************************/
 #define  ARRAY_LEN 50
 void Paint_DrawNum(uint16_t Xpoint, uint16_t Ypoint, int32_t Nummber,
-                   sFONT* Font, uint16_t Color_Background, uint16_t Color_Foreground )
+                   uint16_t Color_Background, uint16_t Color_Foreground )
 {
 
   int16_t Num_Bit = 0, Str_Bit = 0;
@@ -592,7 +519,7 @@ void Paint_DrawNum(uint16_t Xpoint, uint16_t Ypoint, int32_t Nummber,
   }
 
   //show
-  Paint_DrawString_EN(Xpoint, Ypoint, (const char*)pStr, Font, Color_Background, Color_Foreground);
+  Paint_DrawString_EN(Xpoint, Ypoint, (const char*)pStr, Color_Background, Color_Foreground);
 }
 /******************************************************************************
 function:	Display float number
@@ -605,7 +532,7 @@ parameter:
     Color            : Select the background color of the English character
 ******************************************************************************/
 void Paint_DrawFloatNum(uint16_t Xpoint, uint16_t Ypoint, double Nummber,  uint8_t Decimal_Point, 
-                        sFONT* Font,  uint16_t Color_Background, uint16_t Color_Foreground)
+                        uint16_t Color_Background, uint16_t Color_Foreground)
 {
   char Str[ARRAY_LEN] = {0};
   char * pStr= (char *)malloc((strlen(Str))*sizeof(char));
@@ -616,7 +543,7 @@ void Paint_DrawFloatNum(uint16_t Xpoint, uint16_t Ypoint, double Nummber,  uint8
 	*(pStr+strlen(Str)-3)='\0';
   }
   //show
-  Paint_DrawString_EN(Xpoint, Ypoint, (const char*)pStr, Font, Color_Foreground, Color_Background);
+  Paint_DrawString_EN(Xpoint, Ypoint, (const char*)pStr, Color_Foreground, Color_Background);
   free(pStr);
   pStr=NULL;
 }
@@ -630,22 +557,22 @@ void Paint_DrawFloatNum(uint16_t Xpoint, uint16_t Ypoint, double Nummber,  uint8
     Font             ：A structure pointer that displays a character size
     Color            : Select the background color of the English character
 ******************************************************************************/
-void Paint_DrawTime(uint16_t Xstart, uint16_t Ystart, PAINT_TIME *pTime, sFONT* Font,
+void Paint_DrawTime(uint16_t Xstart, uint16_t Ystart, PAINT_TIME *pTime,
                     uint16_t Color_Background, uint16_t Color_Foreground)
 {
   uint8_t value[10] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-  uint16_t Dx = Font->Width;
+  uint16_t Dx = FONT_WIDTH;
 
   //Write data into the cache
-  Paint_DrawChar(Xstart                           , Ystart, value[pTime->Hour / 10], Font, Color_Background, Color_Foreground);
-  Paint_DrawChar(Xstart + Dx                      , Ystart, value[pTime->Hour % 10], Font, Color_Background, Color_Foreground);
-  Paint_DrawChar(Xstart + Dx  + Dx / 4 + Dx / 2   , Ystart, ':'                    , Font, Color_Background, Color_Foreground);
-  Paint_DrawChar(Xstart + Dx * 2 + Dx / 2         , Ystart, value[pTime->Min / 10] , Font, Color_Background, Color_Foreground);
-  Paint_DrawChar(Xstart + Dx * 3 + Dx / 2         , Ystart, value[pTime->Min % 10] , Font, Color_Background, Color_Foreground);
-  Paint_DrawChar(Xstart + Dx * 4 + Dx / 2 - Dx / 4, Ystart, ':'                    , Font, Color_Background, Color_Foreground);
-  Paint_DrawChar(Xstart + Dx * 5                  , Ystart, value[pTime->Sec / 10] , Font, Color_Background, Color_Foreground);
-  Paint_DrawChar(Xstart + Dx * 6                  , Ystart, value[pTime->Sec % 10] , Font, Color_Background, Color_Foreground);
+  Paint_DrawChar(Xstart                           , Ystart, value[pTime->Hour / 10], Color_Background, Color_Foreground);
+  Paint_DrawChar(Xstart + Dx                      , Ystart, value[pTime->Hour % 10], Color_Background, Color_Foreground);
+  Paint_DrawChar(Xstart + Dx  + Dx / 4 + Dx / 2   , Ystart, ':'                    , Color_Background, Color_Foreground);
+  Paint_DrawChar(Xstart + Dx * 2 + Dx / 2         , Ystart, value[pTime->Min / 10] , Color_Background, Color_Foreground);
+  Paint_DrawChar(Xstart + Dx * 3 + Dx / 2         , Ystart, value[pTime->Min % 10] , Color_Background, Color_Foreground);
+  Paint_DrawChar(Xstart + Dx * 4 + Dx / 2 - Dx / 4, Ystart, ':'                    , Color_Background, Color_Foreground);
+  Paint_DrawChar(Xstart + Dx * 5                  , Ystart, value[pTime->Sec / 10] , Color_Background, Color_Foreground);
+  Paint_DrawChar(Xstart + Dx * 6                  , Ystart, value[pTime->Sec % 10] , Color_Background, Color_Foreground);
 }
 
 /******************************************************************************

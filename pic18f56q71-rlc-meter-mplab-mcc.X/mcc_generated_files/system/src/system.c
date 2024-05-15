@@ -63,11 +63,9 @@ void SYSTEM_Initialize(void)
     CLC8_Initialize();
     CPU_Initialize();
     DAC1_Initialize();
-    DAC3_Initialize();
     DMA1_Initialize();
     DMA2_Initialize();
     DMA3_Initialize();
-    FVR_Initialize();
     OPA1_Initialize();
     OPA2_Initialize();
     PWM1_16BIT_Initialize();

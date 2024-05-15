@@ -51,16 +51,12 @@ extern uint8_t adcSamplesArray3[512];
 int16_t voltageSampleArray[WAVE_STEPS];
 int16_t currentSampleArray[WAVE_STEPS];
 
-volatile bool dma1_transfer_ended = false;
-volatile bool dma3_transfer_ended = false;
-volatile bool dma_transfer_done = false;
-volatile uint8_t adc_buffer_index = 0;
-volatile bool adc_buffer_full = false;
+volatile bool dma1TransferEnded = false;
+volatile bool dma3TransferEnded = false;
+volatile bool dmaTransferDone = false;
 
-static bool isVoltage = true;
-static int16_t * adc_value;
+static int16_t *adcValue;
 static uint8_t dmaCounter;
-static float dutRes, dutReact;
 
 enum COMPONENT component = CAPACITOR;
 
@@ -74,13 +70,13 @@ void DMA1_Transfer_Ended_Handler(void)
     if (dmaCounter == 0)
     {
         DisableADCTrigger();
-        dma_transfer_done = true;
+        dmaTransferDone = true;
     }
     else
     {
         DMA3_TransferWithTriggerStart();
     }
-    dma1_transfer_ended = true;        
+    dma1TransferEnded = true;        
     LED0_Toggle();
 }
 
@@ -90,35 +86,35 @@ void DMA3_Transfer_Ended_Handler(void)
     if (dmaCounter == 0)
     {
         DisableADCTrigger();
-        dma_transfer_done = true;
+        dmaTransferDone = true;
     } 
     else
     {
         DMA1_TransferWithTriggerStart();
     }
-    dma3_transfer_ended = true;        
+    dma3TransferEnded = true;        
     LED0_Toggle();
 }
 
-void AquireWaveform(void)
+void Aquire_Waveform(void)
 {
     DMA1_TransferWithTriggerStart();
     EnableADCTrigger();
-    while (dma1_transfer_ended != true){};
+    while (dma1TransferEnded != true){};
     DisableADCTrigger();       
-    dma1_transfer_ended = false;    
+    dma1TransferEnded = false;    
 }
 
-void GetRawData(uint8_t noSamples, int16_t* dataBuffer)
+void Get_Raw_Data(uint8_t noSamples, int16_t* dataBuffer)
 {
-    static bool raw_data_ready;
+    static bool rawDataReady;
     
-    raw_data_ready = false;
+    rawDataReady = false;
     
     dmaCounter = noSamples;
-    dma1_transfer_ended = false;    
-    dma3_transfer_ended = false;
-    dma_transfer_done = false;
+    dma1TransferEnded = false;    
+    dma3TransferEnded = false;
+    dmaTransferDone = false;
     
     for (uint8_t i = 0; i < WAVE_STEPS; i++)
     {
@@ -128,56 +124,55 @@ void GetRawData(uint8_t noSamples, int16_t* dataBuffer)
     DMA1_TransferWithTriggerStart();
     EnableADCTrigger();
     
-    while (raw_data_ready == false)
+    while (rawDataReady == false)
     {
-       if (dma1_transfer_ended == true)
+       if (dma1TransferEnded == true)
        {
-            adc_value = (int16_t*)adcSamplesArray;
+            adcValue = (int16_t*)adcSamplesArray;
             for (uint8_t i = 0; i < WAVE_STEPS; i++)
             {
-                dataBuffer[i] += adc_value[i];
+                dataBuffer[i] += adcValue[i];
             }           
-            dma1_transfer_ended = false;  
+            dma1TransferEnded = false;  
        }
        
-       if (dma3_transfer_ended == true)
+       if (dma3TransferEnded == true)
        {
-            adc_value = (int16_t*)adcSamplesArray3;
+            adcValue = (int16_t*)adcSamplesArray3;
             for (uint8_t i = 0; i < WAVE_STEPS; i++)
             {
-                dataBuffer[i] += adc_value[i];
+                dataBuffer[i] += adcValue[i];
             }
-            dma3_transfer_ended = false;  
+            dma3TransferEnded = false;  
        }    
        
-       if ((dma_transfer_done == true) && (dma1_transfer_ended == false) && (dma3_transfer_ended == false))
+       if ((dmaTransferDone == true) && (dma1TransferEnded == false) && (dma3TransferEnded == false))
        {
-           raw_data_ready = true;
+           rawDataReady = true;
        }
     }
 }
 
-float abs_val(float x)
+float Abs_Val(float x)
 {
     return x > 0 ? x : (-1.0 * x);
 }
 
 int main(void)
 {
-    uint8_t dma1_transfer_number = 0;
-    uint8_t buffer_index = 0;
-    bool buffer_full = false;
-    float results_buffer[BUFFER_NO] = {0};
+    uint8_t bufferIndex = 0;
+    bool bufferFull = false;
+    float resultsBuffer[BUFFER_NO] = {0};
     float theta;
     float Q;
     float result;
     
-    volatile bool isComponent = false;
+    volatile bool componentDetected = false;
     volatile bool newComponent = false;
-    volatile uint8_t v_gain_index = OPA2_R2byR1_is_1;
-    volatile uint8_t i_gain_index = OPA2_R2byR1_is_1;
-    volatile bool v_gain_ok = false;
-    volatile bool i_gain_ok = false;
+    volatile uint8_t vGainIndex = OPA2_R2byR1_is_1;
+    volatile uint8_t iGainIndex = OPA2_R2byR1_is_1;
+    volatile bool vGainOk = false;
+    volatile bool iGainOk = false;
     
     SYSTEM_Initialize();
 
@@ -202,123 +197,121 @@ int main(void)
     
     LED0_SetLow();
 
-    adc_value = (int16_t*)adcSamplesArray;
+    adcValue = (int16_t*)adcSamplesArray;
    
     TMR0_Reload(TIMER0_PERIOD);
     TMR4_PeriodCountSet((TIMESAMPLING_RATE - 1)); 
     EnableClock();
     __delay_ms(10);
     EnableWaveformGenerator();
-    dma1_transfer_number = 0;
     
     while (1)
     {
-        if (isComponent == false)
+        if (componentDetected == false)
         {
             // Automatic gain selection when a component is inserted
             
             SelectVoltage();
 
-            GainSet(v_gain_index);
-            set_vGain(v_gain_index);
+            GainSet(vGainIndex);
+            Set_VGain(vGainIndex);
 
             __delay_ms(7); 
-            GetRawData(SAMPLE_NO_CALIBRATION, voltageSampleArray);
+            Get_Raw_Data(SAMPLE_NO_CALIBRATION, voltageSampleArray);
 
             SelectCurrent();
 
-            GainSet(i_gain_index);
-            set_iGain(i_gain_index);
+            GainSet(iGainIndex);
+            Set_IGain(iGainIndex);
 
             __delay_ms(13); 
-            GetRawData(SAMPLE_NO_CALIBRATION, currentSampleArray);
+            Get_Raw_Data(SAMPLE_NO_CALIBRATION, currentSampleArray);
 
-            processImpedanceValues();
+            Process_Impedance_Values();
             
-            if (abs_val(getVReal()) < V_REAL_MIN || abs_val(getVImag()) < V_IMAG_MIN)
+            if (Abs_Val(Get_VReal()) < V_REAL_MIN || Abs_Val(Get_VImag()) < V_IMAG_MIN)
             {
-                if(v_gain_index < 7) 
+                if(vGainIndex < 7) 
                 {
-                    v_gain_index++;
+                    vGainIndex++;
                 }
                 else
                 {
-                    v_gain_ok = true;
+                    vGainOk = true;
                 }
             }
             
-            else if (abs_val(getVReal()) > V_REAL_MAX || abs_val(getVImag()) > V_IMAG_MAX)
+            else if (Abs_Val(Get_VReal()) > V_REAL_MAX || Abs_Val(Get_VImag()) > V_IMAG_MAX)
             {
-                if(v_gain_index > 0) 
+                if(vGainIndex > 0) 
                 {
-                    v_gain_index--;
+                    vGainIndex--;
                 }
                 else
                 {
-                    v_gain_ok = true;
+                    vGainOk = true;
                 }
             }
             
             else
             {
-                v_gain_ok = true;
+                vGainOk = true;
             }
             
-            if (abs_val(getIReal()) < I_REAL_MIN || abs_val(getIImag()) < I_IMAG_MIN)
+            if (Abs_Val(Get_IReal()) < I_REAL_MIN || Abs_Val(Get_IImag()) < I_IMAG_MIN)
             {
-                if(i_gain_index < 7)
+                if(iGainIndex < 7)
                 {
-                    i_gain_index = i_gain_index + 1;
+                    iGainIndex = iGainIndex + 1;
                 }
                 else
                 {
-                    i_gain_ok = true;
+                    iGainOk = true;
                 }
             }
             
-            else if (abs_val(getIReal()) > I_REAL_MAX || abs_val(getIImag()) > I_IMAG_MAX)
+            else if (Abs_Val(Get_IReal()) > I_REAL_MAX || Abs_Val(Get_IImag()) > I_IMAG_MAX)
             {
-                if(i_gain_index > 0) 
+                if(iGainIndex > 0) 
                 {
-                    i_gain_index--;
+                    iGainIndex--;
                 }
                 else
                 {
-                    i_gain_ok = true;
+                    iGainOk = true;
                 }
             }
             
             else
             {
-                i_gain_ok = true;
+                iGainOk = true;
             }
             
-            printf("V_gain %hhu, I_gain %hhu\n\r", v_gain_index, i_gain_index);
-            printf("Vr: %.3f\n\r",getVReal());
-            printf("Vi: %.3f\n\r",getVImag());
-            printf("Ir: %.3f\n\r",getIReal());
-            printf("Ii: %.3f\n\r",getIImag());
-            printf("Zr: %.3f\n\r",getZReal());
-            printf("Zi: %.3f\n\r",getZImag());
+            printf("Vr: %.3f\n\r",Get_VReal());
+            printf("Vi: %.3f\n\r",Get_VImag());
+            printf("Ir: %.3f\n\r",Get_IReal());
+            printf("Ii: %.3f\n\r",Get_IImag());
+            printf("Zr: %.3f\n\r",Get_ZReal());
+            printf("Zi: %.3f\n\r",Get_ZImag());
             printf("\n\r");
             
-            if(newComponent == true && v_gain_ok == true && i_gain_ok == true)
+            if(newComponent == true && vGainOk == true && iGainOk == true)
             {
-                isComponent = true;
+                componentDetected = true;
                 newComponent = false;
-                buffer_index = 0;
-                buffer_full = false;
+                bufferIndex = 0;
+                bufferFull = false;
             }
             
-            if ((getZReal() < 2000000.0) && (getZReal() > -2000000.0) && 
-                (getZImag() > -2000000.0) && (getZImag() < 2000000.0)
-                && isComponent == false && newComponent == false)
+            if ((Get_ZReal() < 2000000.0) && (Get_ZReal() > -2000000.0) && 
+                (Get_ZImag() > -2000000.0) && (Get_ZImag() < 2000000.0)
+                && componentDetected == false && newComponent == false)
             {
                 newComponent = true;
-                v_gain_index = OPA2_R2byR1_is_1;
-                i_gain_index = OPA2_R2byR1_is_1;
-                v_gain_ok = false;
-                i_gain_ok = false;
+                vGainIndex = OPA2_R2byR1_is_1;
+                iGainIndex = OPA2_R2byR1_is_1;
+                vGainOk = false;
+                iGainOk = false;
             }
         }
         
@@ -326,48 +319,47 @@ int main(void)
         {
             SelectVoltage();
 
-            GainSet(v_gain_index);
-            set_vGain(v_gain_index);
+            GainSet(vGainIndex);
+            Set_VGain(vGainIndex);
 
             __delay_ms(7); 
-            GetRawData(SAMPLE_NO, voltageSampleArray);
+            Get_Raw_Data(SAMPLE_NO, voltageSampleArray);
 
             SelectCurrent();
 
-            GainSet(i_gain_index);
-            set_iGain(i_gain_index);
+            GainSet(iGainIndex);
+            Set_IGain(iGainIndex);
 
             __delay_ms(13); 
-            GetRawData(SAMPLE_NO, currentSampleArray);
+            Get_Raw_Data(SAMPLE_NO, currentSampleArray);
 
-            processImpedanceValues(); 
+            Process_Impedance_Values(); 
 
-            printf("V_gain %hhu, I_gain %hhu\n\r", v_gain_index, i_gain_index);
-            printf("Vr: %.3f\n\r",getVReal());
-            printf("Vi: %.3f\n\r",getVImag());
-            printf("Ir: %.3f\n\r",getIReal());
-            printf("Ii: %.3f\n\r",getIImag());
-            printf("Zr: %.3f\n\r",getZReal());
-            printf("Zi: %.3f\n\r",getZImag());
+            printf("Vr: %.3f\n\r",Get_VReal());
+            printf("Vi: %.3f\n\r",Get_VImag());
+            printf("Ir: %.3f\n\r",Get_IReal());
+            printf("Ii: %.3f\n\r",Get_IImag());
+            printf("Zr: %.3f\n\r",Get_ZReal());
+            printf("Zi: %.3f\n\r",Get_ZImag());
 
-            theta = ((getzArg() * 180)/PI);
+            theta = ((Get_ZArg() * 180)/PI);
 
-            if ((getZReal() > 2000000.0) || (getZReal() < -2000000.0) || 
-                (getZImag() < -2000000.0) ||(getZImag() > 2000000.0))
+            if ((Get_ZReal() > 2000000.0) || (Get_ZReal() < -2000000.0) || 
+                (Get_ZImag() < -2000000.0) ||(Get_ZImag() > 2000000.0))
             {
                 printf("No component detected\n\r");
                 Display_No_Component();
-                isComponent = false;
-                v_gain_ok = false;
-                i_gain_ok = false;
+                componentDetected = false;
+                vGainOk = false;
+                iGainOk = false;
             }
             
             else if((theta >= 4.0) && (theta < 176.0))
             {
                 component = CAPACITOR;
                 result = 1000000000.0;
-                Q = getZImag() / getZReal();
-                result = result/(2 * PI * FREQ * getZImag());
+                Q = Get_ZImag() / Get_ZReal();
+                result = result/(2 * PI * FREQ * Get_ZImag());
                 printf("Capacitor: %.3f nF\n\r", result);    
             }
             
@@ -375,41 +367,41 @@ int main(void)
             {
                 component = INDUCTOR;
                 result = -1000.0;
-                result = (result * getZImag())/(2 * PI * FREQ);
-                Q = getZImag() / getZReal();
+                result = (result * Get_ZImag())/(2 * PI * FREQ);
+                Q = Get_ZImag() / Get_ZReal();
                 printf("Inductor: %.3f mF\n\r", result);
             }
             
             else
             {
                 component = RESISTOR;
-                result = getZReal();
-                printf("Resistor: %.3f Ohm\n\r", getZReal());
+                result = Get_ZReal();
+                printf("Resistor: %.3f Ohm\n\r", Get_ZReal());
             }
             printf("\n\r\n\r");
              
-            results_buffer[buffer_index++] = result;
-            buffer_index %= BUFFER_NO;
+            resultsBuffer[bufferIndex++] = result;
+            bufferIndex %= BUFFER_NO;
             
-            if(buffer_index == 0)
+            if(bufferIndex == 0)
             {
-                buffer_full = true;
+                bufferFull = true;
             }
             
-            if(buffer_full)
+            if(bufferFull)
             {
-                double mean_result = 0.0;
+                double meanResult = 0.0;
                 for(uint8_t i = 0; i < BUFFER_NO; i++)
                 {
-                    mean_result += results_buffer[i];
+                    meanResult += resultsBuffer[i];
                 }
                 
-                result = mean_result / BUFFER_NO;
+                result = meanResult / BUFFER_NO;
             }
             
-            if(isComponent)
+            if(componentDetected)
             {
-                Display_Result(component, result, Q, getzMod(), theta);
+                Display_Result(component, result, Q, Get_ZMod(), theta);
             }
         }
     }          

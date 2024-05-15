@@ -1,3 +1,24 @@
+/* Microchip Technology Inc. and its subsidiaries.  You may use this software 
+ * and any derivatives exclusively with Microchip products. 
+ * 
+ * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS".  NO WARRANTIES, WHETHER 
+ * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED 
+ * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A 
+ * PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION 
+ * WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION. 
+ *
+ * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE, 
+ * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND 
+ * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS 
+ * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE.  TO THE 
+ * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS 
+ * IN ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF 
+ * ANY, THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+ *
+ * MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE 
+ * TERMS. 
+ */
+
 /* 
  * File:   rlc.h
  * Author: M91266
@@ -58,7 +79,7 @@ extern "C" {
 
 #if WAVE_STEPS == 250
 
-const uint16_t wave_ROM_250[] __at(0x001000) =
+const uint16_t waveROM250[] __at(0x001000) =
 {
     512, 517, 522, 526, 531, 536, 541, 546, 550, 555, 560, 564, 569, 574, 578, 583, 
     587, 592, 596, 600, 604, 609, 613, 617, 621, 625, 629, 633, 636, 640, 643, 647, 
@@ -108,18 +129,18 @@ const float cosTable[63] =
 
 const float opaGainTable[] = {1.07, 1.14, 1.33, 2.0, 2.67, 4.0, 8.0, 16.0};
 
-void processImpedanceValues(void);
+void Process_Impedance_Values(void);
 
-float getZReal(void);
-float getZImag(void);
-float getVReal(void);
-float getVImag(void);
-float getIReal(void);
-float getIImag(void);
-float getzArg(void);
-float getzMod(void);
-void set_vGain(uint8_t index);
-void set_iGain(uint8_t index);
+float Get_ZReal(void);
+float Get_ZImag(void);
+float Get_VReal(void);
+float Get_VImag(void);
+float Get_IReal(void);
+float Get_IImag(void);
+float Get_ZArg(void);
+float Get_ZMod(void);
+void Set_VGain(uint8_t index);
+void Set_IGain(uint8_t index);
 
 
 #ifdef	__cplusplus

@@ -1,3 +1,33 @@
+ /*
+ * RLC File
+ * 
+ * @file rlc.c
+ * 
+ * @defgroup rlc
+ * 
+ * @brief This file contains the implementation of the RLC functions.
+*/
+
+/*
+© [2024] Microchip Technology Inc. and its subsidiaries.
+
+    Subject to your compliance with these terms, you may use Microchip 
+    software and any derivatives exclusively with Microchip products. 
+    You are responsible for complying with 3rd party license terms  
+    applicable to your use of 3rd party software (including open source  
+    software) that may accompany Microchip software. SOFTWARE IS ?AS IS.? 
+    NO WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS 
+    SOFTWARE, INCLUDING ANY IMPLIED WARRANTIES OF NON-INFRINGEMENT,  
+    MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT 
+    WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE, 
+    INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY 
+    KIND WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF 
+    MICROCHIP HAS BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE 
+    FORESEEABLE. TO THE FULLEST EXTENT ALLOWED BY LAW, MICROCHIP?S 
+    TOTAL LIABILITY ON ALL CLAIMS RELATED TO THE SOFTWARE WILL NOT 
+    EXCEED AMOUNT OF FEES, IF ANY, YOU PAID DIRECTLY TO MICROCHIP FOR 
+    THIS SOFTWARE.
+*/
 #include <xc.h>
 #include "rlc.h"
 #include "math.h"
@@ -12,7 +42,7 @@ static float zReal_Raw, zImag_Raw, yReal_Raw, yImag_Raw;
 static float zMod, zArg;
 static float vGain, iGain;
 
-float getSin(uint8_t index)
+float Get_Sin(uint8_t index)
 {
     if (index >=   0 &&  index < 63 ) return sinTable[index];
     if (index >=  63 &&  index < 125 )  return (sinTable[125 - index]);
@@ -20,16 +50,16 @@ float getSin(uint8_t index)
     if (index >= 188 &&  index < 250 )  return (-1.0 * sinTable[250 - index]);
 }
 
-float getCos(uint8_t index)
+float Get_Cos(uint8_t index)
 {
     if (index >= 0   &&  index < 63 ) return cosTable[index];
     if (index >= 63  &&  index < 125 )  return (-1.0 * cosTable[125 - index]);
     if (index >= 125 &&  index < 188 ) return (-1.0 * cosTable[index - 125]);
-    if (index >= 188 &&  index < 250 )  return ( cosTable[250 - index]);
+    if (index >= 188 &&  index < 250 )  return (cosTable[250 - index]);
     
 }
 
-void processImpedanceValues(void)
+void Process_Impedance_Values(void)
 {
      vReal_Raw = 0;
      vImag_Raw = 0;
@@ -41,10 +71,10 @@ void processImpedanceValues(void)
         uint16_t index;
         
         index  = (i * TIMESAMPLING_RATE) % WAVE_STEPS;
-        vReal_Raw = vReal_Raw + (float)(voltageSampleArray[i] * 1.0) * (float)getCos(index);
-        vImag_Raw = vImag_Raw + (float)(voltageSampleArray[i] * 1.0) * (float)getSin(index);
-        iReal_Raw = iReal_Raw + (float)(currentSampleArray[i] * 1.0) * (float)getCos(index);
-        iImag_Raw = iImag_Raw + (float)(currentSampleArray[i] * 1.0) * (float)getSin(index);
+        vReal_Raw = vReal_Raw + (float)(voltageSampleArray[i] * 1.0) * (float)Get_Cos(index);
+        vImag_Raw = vImag_Raw + (float)(voltageSampleArray[i] * 1.0) * (float)Get_Sin(index);
+        iReal_Raw = iReal_Raw + (float)(currentSampleArray[i] * 1.0) * (float)Get_Cos(index);
+        iImag_Raw = iImag_Raw + (float)(currentSampleArray[i] * 1.0) * (float)Get_Sin(index);
     }
    
     /* Scale by gain */     
@@ -61,54 +91,54 @@ void processImpedanceValues(void)
     zArg = atan2(zImag_Raw, zReal_Raw);
 }
 
-float getZReal(void)
+float Get_ZReal(void)
 {
     return zReal_Raw;
 }
 
-float getZImag(void)
+float Get_ZImag(void)
 {
     return zImag_Raw;
 }
 
-float getVReal(void)
+float Get_VReal(void)
 {
     return vReal_Raw;
 }
 
-float getVImag(void)
+float Get_VImag(void)
 {
     return vImag_Raw;
 }
 
-float getIReal(void)
+float Get_IReal(void)
 {
     return iReal_Raw;
 }
 
-float getIImag(void)
+float Get_IImag(void)
 {
     return iImag_Raw;
 }
 
-float getzArg(void)
+float Get_ZArg(void)
 {
     return zArg;
 }
 
-float getzMod(void)
+float Get_ZMod(void)
 {
     return zMod;
 }
 
-void set_vGain(uint8_t index)
+void Set_VGain(uint8_t index)
 {
     if (index > 7) vGain = 1.00;
     else vGain = opaGainTable[index];
 
 }
 
-void set_iGain(uint8_t index)
+void Set_IGain(uint8_t index)
 {
     if (index > 7) iGain = 1.00;
     else iGain = opaGainTable[index];

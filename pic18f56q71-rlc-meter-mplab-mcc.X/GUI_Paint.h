@@ -13,11 +13,11 @@
 * | Info        :    
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documnetation files (the "Software"), to deal
+* of this software and associated documentation files (the "Software"), to deal
 * in the Software without restriction, including without limitation the rights
 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 * copies of the Software, and to permit persons to  whom the Software is
-* furished to do so, subject to the following conditions:
+* furnished to do so, subject to the following conditions:
 *
 * The above copyright notice and this permission notice shall be included in
 * all copies or substantial portions of the Software.
@@ -35,7 +35,7 @@
 #define __GUI_PAINT_H
 
 #include "LCD_Driver.h"
-#include "fonts.h"
+
 /**
  * Image attributes
 **/
@@ -172,12 +172,12 @@ void Paint_DrawRectangle(uint16_t Xstart, uint16_t Ystart, uint16_t Xend, uint16
 void Paint_DrawCircle(uint16_t X_Center, uint16_t Y_Center, uint16_t Radius, uint16_t Color, DOT_PIXEL Line_width, DRAW_FILL Draw_Fill );
 
 // Display string
-void Paint_DrawChar(uint16_t Xstart, uint16_t Ystart, const char Acsii_Char, sFONT* Font, uint16_t Color_Background, uint16_t Color_Foreground);
-void Paint_DrawString_EN(uint16_t Xstart, uint16_t Ystart, const char * pString, sFONT* Font, uint16_t Color_Background, uint16_t Color_Foreground);
-void Paint_DrawString_CN(uint16_t Xstart, uint16_t Ystart, const char * pString, cFONT* font, uint16_t Color_Background, uint16_t Color_Foreground);
-void Paint_DrawNum(uint16_t Xpoint, uint16_t Ypoint, int32_t Nummber, sFONT* Font, uint16_t Color_Background, uint16_t Color_Foreground);
-void Paint_DrawFloatNum(uint16_t Xpoint, uint16_t Ypoint, double Nummber,  uint8_t Decimal_Point, sFONT* Font, uint16_t Color_Background, uint16_t Color_Foreground);
-void Paint_DrawTime(uint16_t Xstart, uint16_t Ystart, PAINT_TIME *pTime, sFONT* Font, uint16_t Color_Background, uint16_t Color_Foreground);
+void Paint_DrawChar(uint16_t Xstart, uint16_t Ystart, const char Acsii_Char, uint16_t Color_Background, uint16_t Color_Foreground);
+void Paint_DrawString_EN(uint16_t Xstart, uint16_t Ystart, const char * pString, uint16_t Color_Background, uint16_t Color_Foreground);
+void Paint_DrawString_CN(uint16_t Xstart, uint16_t Ystart, const char * pString, uint16_t Color_Background, uint16_t Color_Foreground);
+void Paint_DrawNum(uint16_t Xpoint, uint16_t Ypoint, int32_t Nummber, uint16_t Color_Background, uint16_t Color_Foreground);
+void Paint_DrawFloatNum(uint16_t Xpoint, uint16_t Ypoint, double Nummber,  uint8_t Decimal_Point, uint16_t Color_Background, uint16_t Color_Foreground);
+void Paint_DrawTime(uint16_t Xstart, uint16_t Ystart, PAINT_TIME *pTime, uint16_t Color_Background, uint16_t Color_Foreground);
 
 // Picture
 void Paint_DrawImage(const unsigned char *image,uint16_t Startx, uint16_t Starty,uint16_t Endx, uint16_t Endy); 

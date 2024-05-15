@@ -18,16 +18,12 @@
           <itemPath>mcc_generated_files/clc/clc3.h</itemPath>
         </logicalFolder>
         <logicalFolder name="dac" displayName="dac" projectFiles="true">
-          <itemPath>mcc_generated_files/dac/dac3.h</itemPath>
           <itemPath>mcc_generated_files/dac/dac1.h</itemPath>
         </logicalFolder>
         <logicalFolder name="dma" displayName="dma" projectFiles="true">
           <itemPath>mcc_generated_files/dma/dma2.h</itemPath>
           <itemPath>mcc_generated_files/dma/dma1.h</itemPath>
           <itemPath>mcc_generated_files/dma/dma3.h</itemPath>
-        </logicalFolder>
-        <logicalFolder name="fvr" displayName="fvr" projectFiles="true">
-          <itemPath>mcc_generated_files/fvr/fvr.h</itemPath>
         </logicalFolder>
         <logicalFolder name="opa" displayName="opa" projectFiles="true">
           <itemPath>mcc_generated_files/opa/opa1.h</itemPath>
@@ -62,8 +58,8 @@
       <itemPath>rlc.h</itemPath>
       <itemPath>GUI_Paint.h</itemPath>
       <itemPath>LCD_Driver.h</itemPath>
-      <itemPath>fonts.h</itemPath>
       <itemPath>display.h</itemPath>
+      <itemPath>font.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -97,7 +93,6 @@
         </logicalFolder>
         <logicalFolder name="dac" displayName="dac" projectFiles="true">
           <logicalFolder name="src" displayName="src" projectFiles="true">
-            <itemPath>mcc_generated_files/dac/src/dac3.c</itemPath>
             <itemPath>mcc_generated_files/dac/src/dac1.c</itemPath>
           </logicalFolder>
         </logicalFolder>
@@ -106,11 +101,6 @@
             <itemPath>mcc_generated_files/dma/src/dma2.c</itemPath>
             <itemPath>mcc_generated_files/dma/src/dma1.c</itemPath>
             <itemPath>mcc_generated_files/dma/src/dma3.c</itemPath>
-          </logicalFolder>
-        </logicalFolder>
-        <logicalFolder name="fvr" displayName="fvr" projectFiles="true">
-          <logicalFolder name="src" displayName="src" projectFiles="true">
-            <itemPath>mcc_generated_files/fvr/src/fvr.c</itemPath>
           </logicalFolder>
         </logicalFolder>
         <logicalFolder name="opa" displayName="opa" projectFiles="true">
@@ -154,7 +144,6 @@
       <itemPath>rlc.c</itemPath>
       <itemPath>GUI_Paint.c</itemPath>
       <itemPath>LCD_Driver.c</itemPath>
-      <itemPath>font24.c</itemPath>
       <itemPath>display.c</itemPath>
     </logicalFolder>
   </logicalFolder>
