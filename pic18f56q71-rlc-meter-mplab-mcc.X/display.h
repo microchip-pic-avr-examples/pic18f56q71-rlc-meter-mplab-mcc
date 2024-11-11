@@ -26,30 +26,35 @@
  
 #include <stdio.h>
 #include <string.h>
-#include "GUI_Paint.h"
-#include "LCD_Driver.h"
+#include "OLEDC_Click.h"
+#include "OLEDC_shapes.h"
+#include "OLEDC_colors.h"
 
-#define ROW1        30
-#define ROW2        80
-#define ROW3        110
-#define ROW4        140
+#define COMPONENT_LINE        0
+#define Q_LINE                1
+#define Z_LINE                2
+#define TH_LINE               3
+#define MESSAGE1_LINE         4
+#define MESSAGE2_LINE         5
 
-#define COLUMN1     10
-#define COLUMN2     70
-#define COLUMN3     208
-#define COLUMN4     225
+#define NAME_COLUMN           0
+#define VALUE_COLUMN          3
+#define MULTIPLIER_COLUMN     11
+#define UNIT_COLUMN           12
+#define MESSAGE_COLUMN        0
 
 enum COMPONENT {CAPACITOR = 0, INDUCTOR = 1, RESISTOR = 2};
 
 void Display_Init(void);
 void Display_Interface(void);
+void Display_Message(char *string1, char *string2);
 void Display_Result(enum COMPONENT component, float result, float Q, float z, float theta);
 void Display_No_Component(void);
 void Display_Component(void);
 void Display_Value(float result);
-void Display_Impedance(float result);
-void Display_Q(float result);
-void Display_Theta(float result);
+void Display_Impedance(float z);
+void Display_Q(float q);
+void Display_Theta(float theta);
 
 #ifdef	__cplusplus
 extern "C" {

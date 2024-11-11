@@ -4,7 +4,7 @@
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
             <name>pic18f56q71-rlc-meter-mplab-mcc</name>
-            <creation-uuid>d085d55c-9bd6-4949-be65-bd771f3da0ab</creation-uuid>
+            <creation-uuid>2982cbbb-3831-433e-9215-6c4aaaac7467</creation-uuid>
             <make-project-type>0</make-project-type>
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <make-dep-projects/>

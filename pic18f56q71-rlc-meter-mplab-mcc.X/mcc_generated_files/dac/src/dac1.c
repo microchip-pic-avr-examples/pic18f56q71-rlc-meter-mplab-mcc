@@ -43,14 +43,14 @@
 
 void DAC1_Initialize(void) 
 { 
-    //DACPSS VDD; DACNSS VSS; DACOE DACOUT1 Enabled and DACOUT2 Disabled; DACEN enabled; 
-    DAC1CON =  144;
+    //DACPSS VDD; DACNSS VSS; DACOE DACOUT1 and DACOUT2 are Disabled; DACEN enabled; 
+    DAC1CON =  0x80;
 
-    //DACR 1; 
-    DAC1DATH =  1;
+    //DACR 2; 
+    DAC1DATH =  0x2;
 
-    //DACR 62; 
-    DAC1DATL =  62;     
+    //DACR 0; 
+    DAC1DATL =  0x0;     
 }
 
 void DAC1_SetOutput(uint16_t inputData) 

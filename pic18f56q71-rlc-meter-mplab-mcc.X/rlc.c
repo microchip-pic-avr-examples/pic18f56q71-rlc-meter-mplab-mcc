@@ -32,11 +32,11 @@
 #include "rlc.h"
 #include "math.h"
 
-
 extern int16_t voltageSampleArray[WAVE_STEPS];
 extern int16_t currentSampleArray[WAVE_STEPS];
 
 float vReal_Raw, vImag_Raw, iReal_Raw, iImag_Raw;
+float vRealUnscaled, vImagUnscaled, iRealUnscaled, iImagUnscaled;
 
 static float zReal_Raw, zImag_Raw, yReal_Raw, yImag_Raw;
 static float zMod, zArg;
@@ -56,26 +56,30 @@ float Get_Cos(uint8_t index)
     if (index >= 63  &&  index < 125 )  return (-1.0 * cosTable[125 - index]);
     if (index >= 125 &&  index < 188 ) return (-1.0 * cosTable[index - 125]);
     if (index >= 188 &&  index < 250 )  return (cosTable[250 - index]);
-    
 }
 
 void Process_Impedance_Values(void)
-{
-     vReal_Raw = 0;
-     vImag_Raw = 0;
-     iReal_Raw = 0;
-     iImag_Raw = 0;
-     
-    for (uint8_t i = 0; i < WAVE_STEPS; i++)
+{ 
+    uint16_t index = 0;
+    
+    vReal_Raw = 0.0;
+    vImag_Raw = 0.0;
+    iReal_Raw = 0.0;
+    iImag_Raw = 0.0;
+
+    for (uint16_t i = 0; i < WAVE_STEPS; i++)
     {
-        uint16_t index;
-        
-        index  = (i * TIMESAMPLING_RATE) % WAVE_STEPS;
+        index  = (i * timesamplingRates[TIMESAMPLING_RATE]) % WAVE_STEPS;
         vReal_Raw = vReal_Raw + (float)(voltageSampleArray[i] * 1.0) * (float)Get_Cos(index);
         vImag_Raw = vImag_Raw + (float)(voltageSampleArray[i] * 1.0) * (float)Get_Sin(index);
         iReal_Raw = iReal_Raw + (float)(currentSampleArray[i] * 1.0) * (float)Get_Cos(index);
         iImag_Raw = iImag_Raw + (float)(currentSampleArray[i] * 1.0) * (float)Get_Sin(index);
     }
+    
+    vRealUnscaled = vReal_Raw;
+    vImagUnscaled = vImag_Raw;
+    iRealUnscaled = iReal_Raw;
+    iImagUnscaled = iImag_Raw;
    
     /* Scale by gain */     
     vReal_Raw = 1000.0 * vReal_Raw / vGain ;
@@ -131,16 +135,39 @@ float Get_ZMod(void)
     return zMod;
 }
 
+float Get_VRealUnscaled(void)
+{
+    return vRealUnscaled;
+}
+
+float Get_VImagUnscaled(void)
+{
+    return vImagUnscaled;
+}
+
+float Get_IRealUnscaled(void)
+{
+    return iRealUnscaled;
+}
+
+float Get_IImagUnscaled(void)
+{
+    return iImagUnscaled;
+}
+
+float Get_Gain(uint8_t index)
+{
+    return opaGainTable[index];
+}
+
 void Set_VGain(uint8_t index)
 {
     if (index > 7) vGain = 1.00;
     else vGain = opaGainTable[index];
-
 }
 
 void Set_IGain(uint8_t index)
 {
     if (index > 7) iGain = 1.00;
     else iGain = opaGainTable[index];
-
 }

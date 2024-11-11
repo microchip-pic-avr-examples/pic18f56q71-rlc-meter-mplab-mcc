@@ -7,7 +7,7 @@
  * 
  * @brief This file contains the API implementations for the CLC6 driver.
  *
- * @version CLC6 Driver Version 1.1.0
+ * @version CLC6 Driver Version 1.2.0
 */
 /*
 © [2024] Microchip Technology Inc. and its subsidiaries.
@@ -34,6 +34,9 @@
 #include <xc.h>
 #include "../clc6.h"
 
+
+static void (*CLC6_Callback)(void);
+static void CLC6_DefaultCallback(void);
 
 void CLC6_Initialize(void) 
 {
@@ -63,16 +66,70 @@ void CLC6_Initialize(void)
     // LCMODE 1-input D flip-flop with S and R; LCINTN disabled; LCINTP disabled; LCEN enabled; 
     CLCnCON = 0x84;
 
+    //Set default callback for CLC6 interrupt Overflow.
+    CLC6_CallbackRegister(CLC6_DefaultCallback);
+
+    // Clear the CLC interrupt flag
+    PIR5bits.CLC6IF = 0;
 }
 
 void CLC6_Enable(void) 
 {
+    CLCSELECTbits.SLCT = 5;
     CLCnCONbits.EN = 1;
 }
 
 void CLC6_Disable(void) 
 {
+    CLCSELECTbits.SLCT = 5;
     CLCnCONbits.EN = 0;
+}
+
+void CLC6_RisingEdgeDetectionEnable(void) 
+{
+    CLCSELECTbits.SLCT = 5;
+    CLCnCONbits.INTP = 1;
+}
+
+void CLC6_RisingEdgeDetectionDisable(void) 
+{
+    CLCSELECTbits.SLCT = 5;
+    CLCnCONbits.INTP = 0;
+}
+
+void CLC6_FallingEdgeDetectionEnable(void) 
+{
+    CLCSELECTbits.SLCT = 5;
+    CLCnCONbits.INTN = 1;
+}
+
+void CLC6_FallingEdgeDetectionDisable(void) 
+{
+    CLCSELECTbits.SLCT = 5;
+    CLCnCONbits.INTN = 0;
+}
+
+void CLC6_CallbackRegister(void (* CallbackHandler)(void))
+{
+    CLC6_Callback = CallbackHandler;
+}
+
+static void CLC6_DefaultCallback(void)
+{
+    //Add your interrupt code here or
+    //Use CLC6_CallbackRegister function to use Custom ISR
+}
+
+void CLC6_Tasks(void)
+{
+    if(PIR5bits.CLC6IF == 1)
+    {
+        if(CLC6_Callback != NULL)
+        {
+            CLC6_Callback();
+        }
+        PIR5bits.CLC6IF = 0;
+    }
 }
 
 

@@ -80,7 +80,23 @@ void  INTERRUPT_Initialize (void)
 void __interrupt() INTERRUPT_InterruptManager (void)
 {
     // interrupt handler
-    if(PIE9bits.DMA3AIE == 1 && PIR9bits.DMA3AIF == 1)
+    if(PIE0bits.IOCIE == 1 && PIR0bits.IOCIF == 1)
+    {
+        PIN_MANAGER_IOC();
+    }
+    else if(PIE6bits.DMA2AIE == 1 && PIR6bits.DMA2AIF == 1)
+    {
+        DMA2_DMAAI_ISR();
+    }
+    else if(PIE6bits.DMA2SCNTIE == 1 && PIR6bits.DMA2SCNTIF == 1)
+    {
+        DMA2_DMASCNTI_ISR();
+    }
+    else if(PIE6bits.DMA2ORIE == 1 && PIR6bits.DMA2ORIF == 1)
+    {
+        DMA2_DMAORI_ISR();
+    }
+    else if(PIE9bits.DMA3AIE == 1 && PIR9bits.DMA3AIF == 1)
     {
         DMA3_DMAAI_ISR();
     }
@@ -111,6 +127,10 @@ void __interrupt() INTERRUPT_InterruptManager (void)
     else if(PIE2bits.DMA1ORIE == 1 && PIR2bits.DMA1ORIF == 1)
     {
         DMA1_DMAORI_ISR();
+    }
+    else if(PIE3bits.TMR2IE == 1 && PIR3bits.TMR2IF == 1)
+    {
+        TMR2_ISR();
     }
     else
     {

@@ -7,7 +7,7 @@
  * 
  * @brief This file contains the API prototypes for the CLC8 driver.
  *
- * @version CLC8 Driver Version 1.1.0
+ * @version CLC8 Driver Version 1.2.0
 */
 /*
 © [2024] Microchip Technology Inc. and its subsidiaries.
@@ -37,17 +37,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define CLC8_Initialize  CLC8_Initialize
-#define CLC8_Enable CLC8_Enable
-#define CLC8_Disable CLC8_Disable
-#define CLC8_ISR CLC8_ISR
-#define CLC8_OutputStatusGet CLC8_OutputStatusGet
-#define CLC8_CLCI_SetInterruptHandler CLC8_CLCI_SetInterruptHandler
 
 
 /**
  * @ingroup clc8
- * @brief  Initializes the CLC8. This routine configures the CLC8 specific control registers.
+ * @brief  Initializes the CLC8 module. This routine configures the CLC8 specific control registers.
  * @param None.
  * @return None.
  */
@@ -69,15 +63,64 @@ void CLC8_Enable(void);
  */
 void CLC8_Disable(void);
 
+/**
+ * @ingroup clc8
+ * @brief Enabes Rising Edge Detection  on CLC8 output for the CLC8 module.     
+ * @param None.
+ * @return None.
+ */
+void CLC8_RisingEdgeDetectionEnable(void);
 
 /**
  * @ingroup clc8
- * @brief Returns the output pin status of the CLC module.
+ * @brief Disables Rising Edge Detection  on CLC8 output for the CLC8 module.     
+ * @param None.
+ * @return None.
+ */
+void CLC8_RisingEdgeDetectionDisable(void);
+
+/**
+ * @ingroup clc8
+ * @brief Enables Falling Edge Detection  on CLC8 output for the CLC8 module.     
+ * @param None.
+ * @return None.
+ */
+void CLC8_FallingEdgeDetectionEnable(void);
+
+/**
+ * @ingroup clc8
+ * @brief Disables Falling Edge Detection on CLC8 output for the CLC8 module.     
+ * @param None.
+ * @return None.
+ */
+void CLC8_FallingEdgeDetectionDisable(void);
+
+
+/**
+ * @ingroup clc8
+ * @brief Returns the output pin status of the CLC8 module.
  * @param  None.
- * @retval True - Output is 1.
- * @retval False - Output is 0.
+ * @retval True - Output is 1
+ * @retval False - Output is 0
  */
 bool CLC8_OutputStatusGet(void); 
+
+/**
+ * @ingroup clc8
+ * @brief Setter function for the CLC8 callback.
+ * @param CallbackHandler - Pointer to the custom callback
+ * @return None.
+ */
+ void CLC8_CallbackRegister(void (* CallbackHandler)(void));
+
+/**
+ * @ingroup clc8
+ * @brief Performs tasks to be executed on rising edge or falling edge event in Polling mode.
+ * @param None.
+ * @return None.
+ */
+void CLC8_Tasks(void);
+
 
 #endif  // CLC8_H
 /**

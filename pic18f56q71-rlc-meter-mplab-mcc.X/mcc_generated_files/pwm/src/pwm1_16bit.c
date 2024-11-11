@@ -118,12 +118,12 @@ void PWM1_16BIT_Initialize(void)
     PWM1CON = 0x80;
 }
 
-void PWM1_16BIT_Enable()
+void PWM1_16BIT_Enable(void)
 {
     PWM1CON |= _PWM1CON_EN_MASK;
 }
 
-void PWM1_16BIT_Disable()
+void PWM1_16BIT_Disable(void)
 {
     PWM1CON &= (~_PWM1CON_EN_MASK);
 }
@@ -159,13 +159,21 @@ void PWM1_16BIT_PWMI_ISR(void)
     {
         PWM1GIRbits.S1P1IF = 0;
         if(PWM1_16BIT_Slice1Output1_InterruptHandler != NULL)
+        {
             PWM1_16BIT_Slice1Output1_InterruptHandler();
+        }
     }
     else if((PWM1GIEbits.S1P2IE == 1) && (PWM1GIRbits.S1P2IF == 1))
     {
         PWM1GIRbits.S1P2IF = 0;
         if(PWM1_16BIT_Slice1Output2_InterruptHandler != NULL)
+        {
             PWM1_16BIT_Slice1Output2_InterruptHandler();
+        }
+    }
+    else
+    {
+        // No Action 
     }
 }
 
@@ -173,7 +181,9 @@ void PWM1_16BIT_PWMPI_ISR(void)
 {
     PIR4bits.PWM1PIF = 0;
     if(PWM1_16BIT_Period_InterruptHandler != NULL)
+    {
         PWM1_16BIT_Period_InterruptHandler();
+    }
 }
 
 void PWM1_16BIT_Slice1Output1_SetInterruptHandler(void (* InterruptHandler)(void))

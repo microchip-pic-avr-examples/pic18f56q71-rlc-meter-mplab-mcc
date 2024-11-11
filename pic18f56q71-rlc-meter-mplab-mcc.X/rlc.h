@@ -19,22 +19,17 @@
  * TERMS. 
  */
 
-/* 
- * File:   rlc.h
- * Author: M91266
- *
- * Created on March 21, 2024, 4:55 PM
- */
-
 #ifndef RLC_H
 #define	RLC_H
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
+    
+#include "mcp6s26.h"
 
-#define EnableWaveformGenerator()      do { LATWbits.LATW2 = 1; } while(0)
-#define DisableWaveformGenerator()     do { LATWbits.LATW2 = 0; } while(0)
+#define EnableWaveformGenerator()       do { LATWbits.LATW2 = 1; } while(0)
+#define DisableWaveformGenerator()      do { LATWbits.LATW2 = 0; } while(0)
 
 #define EnableADCTrigger()              do { LATWbits.LATW1 = 1; } while(0)
 #define DisableADCTrigger()             do { LATWbits.LATW1 = 0; } while(0)
@@ -42,19 +37,37 @@ extern "C" {
 #define EnableClock()                   do { LATWbits.LATW0 = 1; } while(0)
 #define DisableClock()                  do { LATWbits.LATW0 = 0; } while(0)
 
-#define SelectPhase(x)                  do { LATW = ((PORTW & 0x0F)|(0x10 << (x))); } while(0)
+#define SelectCurrent()                 do { MCP6S26_Write_Double_Command(MCP6S26_WRITE_INS | MCP6S26_CH, MCP6S26_MUX_CH3, MCP6S26_MUX_CH2); } while(0)
+#define SelectVoltage()                 do { MCP6S26_Write_Double_Command(MCP6S26_WRITE_INS | MCP6S26_CH, MCP6S26_MUX_CH1, MCP6S26_MUX_CH2); } while(0)
 
-#define SelectCurrent()                 do { OPA2CON3bits.PSS = OPA2_RB3_IN2_pos;} while(0)          //OPA2_IN+ RB3
-#define SelectVoltage()                 do { OPA2CON3bits.PSS = OPA2_RB2_IN3_pos;} while(0)          //OPA2_IN+ RB2
-
-#define GainSet(x)                      do { OPA1CON1bits.GSEL = x; OPA2CON1bits.GSEL = x;} while(0)   
-
+#define GainSet(x)                      do { MCP6S26_Write_Double_Command(MCP6S26_WRITE_INS | MCP6S26_GAIN, x, x); } while(0)   
+  
 #define PI             3.141592654
 
-#define FREQ            1000UL    
+#define FREQ            1000UL  
 #define WAVE_STEPS      250
 
 #define TIMER0_PERIOD    ((_XTAL_FREQ / (16 * WAVE_STEPS * FREQ)) - 1)
+
+typedef enum {
+    TIMESAMPLING_RATE_3 = 0,
+    TIMESAMPLING_RATE_7,
+    TIMESAMPLING_RATE_9,
+    TIMESAMPLING_RATE_11,
+    TIMESAMPLING_RATE_13,
+    TIMESAMPLING_RATE_17,
+    TIMESAMPLING_RATE_19,
+    TIMESAMPLING_RATE_21,
+    TIMESAMPLING_RATE_23
+} sampling_rate_t;
+
+typedef enum {
+    VOLTAGE_PREPARE = 0,
+    VOLTAGE_CALIBRATION,
+    CURRENT_PREPARE,
+    CURRENT_CALIBRATION,
+    WRITE_CALIBRATION    
+} calibration_state_t;
 
 /*
  * TIMESAMPLING_RATE 
@@ -63,40 +76,28 @@ extern "C" {
  *    The aquiring rate is computed as 
  *       FREQ * WAVE_STEPS / TIMESAMPLING_RATE
  * 
- *    TIMESAMPLING_RATE accepted values 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25
+ *    TIMESAMPLING_RATE accepted values 3, 7, 9, 11, 13, 17, 19, 21, 23
  * 
  */    
-#define TIMESAMPLING_RATE       17
-        
-#define V_REAL_MAX              88000000.0       
-#define V_IMAG_MAX              193000000.0
-#define I_REAL_MAX              88000.0
-#define I_IMAG_MAX              193000.0
-#define V_REAL_MIN              17600000.0  // 20%MAX
-#define V_IMAG_MIN              38600000.0
-#define I_REAL_MIN              17600.0
-#define I_IMAG_MIN              38600.0
+#define TIMESAMPLING_RATE       TIMESAMPLING_RATE_17
 
 #if WAVE_STEPS == 250
 
-const uint16_t waveROM250[] __at(0x001000) =
+const uint8_t waveROM250[] __at(0x001000) = 
 {
-    512, 517, 522, 526, 531, 536, 541, 546, 550, 555, 560, 564, 569, 574, 578, 583, 
-    587, 592, 596, 600, 604, 609, 613, 617, 621, 625, 629, 633, 636, 640, 643, 647, 
-    650, 654, 657, 660, 663, 666, 669, 671, 674, 677, 679, 681, 684, 686, 688, 690, 
-    691, 693, 695, 696, 697, 699, 700, 701, 701, 702, 703, 703, 704, 704, 704, 704, 
-    704, 704, 703, 703, 702, 701, 701, 700, 699, 697, 696, 695, 693, 691, 690, 688, 
-    686, 684, 681, 679, 677, 674, 671, 669, 666, 663, 660, 657, 654, 650, 647, 643, 
-    640, 636, 633, 629, 625, 621, 617, 613, 609, 604, 600, 596, 592, 587, 583, 578, 
-    574, 569, 564, 560, 555, 550, 546, 541, 536, 531, 526, 522, 517, 512, 507, 502, 
-    498, 493, 488, 483, 478, 474, 469, 464, 460, 455, 450, 446, 441, 437, 432, 428, 
-    424, 420, 415, 411, 407, 403, 399, 395, 391, 388, 384, 381, 377, 374, 370, 367, 
-    364, 361, 358, 355, 353, 350, 347, 345, 343, 340, 338, 336, 334, 333, 331, 329, 
-    328, 327, 325, 324, 323, 323, 322, 321, 321, 320, 320, 320, 320, 320, 320, 321, 
-    321, 322, 323, 323, 324, 325, 327, 328, 329, 331, 333, 334, 336, 338, 340, 343, 
-    345, 347, 350, 353, 355, 358, 361, 364, 367, 370, 374, 377, 381, 384, 388, 391, 
-    395, 399, 403, 407, 411, 415, 420, 424, 428, 432, 437, 441, 446, 450, 455, 460, 
-    464, 469, 474, 478, 483, 488, 493, 498, 502, 507
+    32, 32, 33, 33, 34, 34, 34, 35, 35, 36, 36, 36, 37, 37, 38, 38, 38, 39, 39, 39,
+    40, 40, 40, 41, 41, 41, 42, 42, 42, 43, 43, 43, 44, 44, 44, 44, 45, 45, 45, 45,
+    46, 46, 46, 46, 46, 46, 47, 47, 47, 47, 47, 47, 47, 48, 48, 48, 48, 48, 48, 48,
+    48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 47, 47, 47, 47, 47, 47, 47,
+    46, 46, 46, 46, 46, 46, 45, 45, 45, 45, 44, 44, 44, 44, 43, 43, 43, 42, 42, 42,
+    41, 41, 41, 40, 40, 40, 39, 39, 39, 38, 38, 38, 37, 37, 36, 36, 36, 35, 35, 34,
+    34, 34, 33, 33, 32, 32, 32, 31, 31, 30, 30, 30, 29, 29, 28, 28, 28, 27, 27, 26,
+    26, 26, 25, 25, 25, 24, 24, 24, 23, 23, 23, 22, 22, 22, 21, 21, 21, 20, 20, 20,
+    20, 19, 19, 19, 19, 18, 18, 18, 18, 18, 18, 17, 17, 17, 17, 17, 17, 17, 16, 16,
+    16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 17, 17,
+    17, 17, 17, 17, 17, 18, 18, 18, 18, 18, 18, 19, 19, 19, 19, 20, 20, 20, 20, 21,
+    21, 21, 22, 22, 22, 23, 23, 23, 24, 24, 24, 25, 25, 25, 26, 26, 26, 27, 27, 28,
+    28, 28, 29, 29, 30, 30, 30, 31, 31, 32
 };
 
 #else
@@ -127,7 +128,9 @@ const float cosTable[63] =
     0.162637165195, 0.137790290685, 0.112856384873, 0.087851196551, 0.062790519529, 0.037690182670, 0.012566039883 
 };
 
-const float opaGainTable[] = {1.07, 1.14, 1.33, 2.0, 2.67, 4.0, 8.0, 16.0};
+const float opaGainTable[] = {1.0, 2.0, 4.0, 5.0, 8.0, 10.0, 16.0, 32.0};
+
+const uint8_t timesamplingRates[] = {3, 7, 9, 11, 13, 17, 19, 21, 23};
 
 void Process_Impedance_Values(void);
 
@@ -139,6 +142,11 @@ float Get_IReal(void);
 float Get_IImag(void);
 float Get_ZArg(void);
 float Get_ZMod(void);
+float Get_VRealUnscaled(void);
+float Get_VImagUnscaled(void);
+float Get_IRealUnscaled(void);
+float Get_IImagUnscaled(void);
+float Get_Gain(uint8_t index);
 void Set_VGain(uint8_t index);
 void Set_IGain(uint8_t index);
 

@@ -5,9 +5,9 @@
  * 
  * @ingroup uart2
  * 
- * @brief This is the generated driver implementation file for the UART2 driver using CCL
+ * @brief This is the generated driver implementation file for the UART2 driver using the Universal Asynchronous Receiver and Transmitter (UART) module.
  *
- * @version UART2 Driver Version 3.0.4
+ * @version UART2 Driver Version 3.0.6
 */
 
 /*

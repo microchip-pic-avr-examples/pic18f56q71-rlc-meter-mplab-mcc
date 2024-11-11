@@ -58,6 +58,9 @@
 #define DMA2_StartTransferWithTrigger      DMA2_TransferWithTriggerStart
 #define DMA2_StopTransfer                  DMA2_TransferStop
 #define DMA2_SetDMAPriority                DMA2_DMAPrioritySet
+#define DMA2_SetSCNTIInterruptHandler      DMA2_SCNTIInterruptHandlerSet 
+#define DMA2_SetAIInterruptHandler         DMA2_AIInterruptHandlerSet 
+#define DMA2_SetORIInterruptHandler        DMA2_ORIInterruptHandlerSet 
 ///@}
 
 /**
@@ -236,5 +239,53 @@ void DMA2_TransferStop(void);
  * NOTE: This function is dependent on the PR1WAY CONFIG bit.
  */
 void DMA2_DMAPrioritySet(uint8_t priority);
+
+/**
+ * @ingroup dma2
+ * @brief Sets the Callback function for the source count interrupt event.
+ * @param *InterruptHandler - Callback function for the source count interrupt event.
+ * @return None.
+ */
+void DMA2_SCNTIInterruptHandlerSet(void (* InterruptHandler)(void));
+
+/**
+ * @ingroup dma2
+ * @brief Implements the Interrupt Service Routine (ISR) for the DMA2 source count interrupt.
+ * @param None.
+ * @return None.
+ */
+void DMA2_DMASCNTI_ISR(void);
+
+/**
+ * @ingroup dma2
+ * @brief Sets the Callback function for the abort interrupt request event.
+ * @param *InterruptHandler - Callback function for the abort interrupt event.
+ * @return None.
+ */
+void DMA2_AIInterruptHandlerSet(void (* InterruptHandler)(void));
+
+/**
+ * @ingroup dma2
+ * @brief Implements the ISR for the DMA2 Abort Trigger interrupt events.
+ * @param None.
+ * @return None.
+ */
+void DMA2_DMAAI_ISR(void);
+
+/**
+ * @ingroup dma2
+ * @brief Sets the callback function for the overrun interrupt event. 
+ * @param *InterruptHandler - Callback function for the overrun interrupt event.
+ * @return None.
+ */
+void DMA2_ORIInterruptHandlerSet(void (* InterruptHandler)(void));
+
+/**
+ * @ingroup dma2
+ * @brief Implements the ISR for the DMA2 overrun interrupt events.
+ * @param None.
+ * @return None.
+ */
+void DMA2_DMAORI_ISR(void);
 
 #endif //DMA2_H

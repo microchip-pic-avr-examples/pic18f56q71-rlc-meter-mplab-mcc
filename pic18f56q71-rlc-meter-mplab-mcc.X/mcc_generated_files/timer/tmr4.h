@@ -5,9 +5,11 @@
  *  
  * @defgroup tmr4 TMR4
  *
- * @brief This file contains the API Prototypes and other data types for the TMR4 driver.
+ * @brief This file contains API prototypes and other data types for the TMR4 driver.
  *
- * @version TMR4 Driver Version 3.0.4
+ * @version Driver Version 4.0.0
+ *
+ * @version Package Version 5.0.0
  */
  
 /*
@@ -36,84 +38,129 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "timer_interface.h"
-
+#include "tmr4_deprecated.h"
 
 /**
- * @ingroup tmr4
- * @brief Defines the Custom Name for the \ref TMR4_Initialize API
+ * @misradeviation{@advisory,2.5}
+ * MCC Melody drivers provide macros that can be added to an application. 
+ * It depends on the application whether a macro is used or not. 
  */
+ 
+/**
+ * @ingroup tmr4
+ * @brief Defines the TMR4 maximum count value.
+ */
+#define TMR4_MAX_COUNT (255U)
+/**
+ * @ingroup tmr4
+ * @brief Defines the TMR4 prescaled clock frequency in hertz.
+ */
+/* cppcheck-suppress misra-c2012-2.5 */
+#define TMR4_CLOCK_FREQ (250000UL)
+/**
+ * @ingroup tmr4
+ * @brief Defines the Custom Name for the \ref TMR4_MAX_COUNT.
+ */
+/* cppcheck-suppress misra-c2012-2.5 */
+#define TIMER4_MAX_COUNT TMR4_MAX_COUNT
+/**
+ * @ingroup tmr4
+ * @brief Defines the Custom Name for the \ref TMR4_CLOCK_FREQ.
+ */
+/* cppcheck-suppress misra-c2012-2.5 */
+#define TIMER4_CLOCK_FREQ TMR4_CLOCK_FREQ
+/**
+ * @ingroup tmr4
+ * @brief Defines the Custom Name for the \ref TMR4_Initialize API.
+ */
+/* cppcheck-suppress misra-c2012-2.5 */
 #define Timer4_Initialize TMR4_Initialize
-
 /**
  * @ingroup tmr4
- * @brief Defines the Custom Name for the \ref TMR4_ModeSet API
+ * @brief Defines the Custom Name for the \ref TMR4_Deinitialize API.
  */
-#define Timer4_ModeSet TMR4_ModeSet
-
+/* cppcheck-suppress misra-c2012-2.5 */
+#define Timer4_Deinitialize TMR4_Deinitialize
 /**
  * @ingroup tmr4
- * @brief Defines the Custom Name for the \ref TMR4_ExtResetSourceSet API
+ * @brief Defines the Custom Name for the \ref TMR4_Start API.
  */
-#define Timer4_ExtResetSourceSet TMR4_ExtResetSourceSet
-
-/**
- * @ingroup tmr4
- * @brief Defines the Custom Name for the \ref TMR4_Start API
- */
+/* cppcheck-suppress misra-c2012-2.5 */
 #define Timer4_Start TMR4_Start
-
 /**
  * @ingroup tmr4
- * @brief Defines the Custom Name for the \ref TMR4_Stop API
+ * @brief Defines the Custom Name for the \ref TMR4_Stop API.
  */
+/* cppcheck-suppress misra-c2012-2.5 */
 #define Timer4_Stop TMR4_Stop
-
 /**
  * @ingroup tmr4
- * @brief Defines the Custom Name for the \ref TMR4_Read API
+ * @brief Defines the Custom Name for the \ref TMR4_CounterGet API.
  */
-#define Timer4_Read TMR4_Read
-
+/* cppcheck-suppress misra-c2012-2.5 */
+#define Timer4_CounterGet TMR4_CounterGet
 /**
  * @ingroup tmr4
- * @brief Defines the Custom Name for the \ref TMR4_Write API
+ * @brief Defines the Custom Name for the \ref TMR4_CounterSet API.
  */
-#define Timer4_Write TMR4_Write
-
+/* cppcheck-suppress misra-c2012-2.5 */
+#define Timer4_CounterSet TMR4_CounterSet
 /**
  * @ingroup tmr4
- * @brief Defines the Custom Name for the \ref TMR4_PeriodCountSet API
+ * @brief Defines the Custom Name for the \ref TMR4_PeriodSet API.
  */
-#define Timer4_PeriodCountSet TMR4_PeriodCountSet
-
+/* cppcheck-suppress misra-c2012-2.5 */
+#define Timer4_PeriodSet TMR4_PeriodSet
 /**
  * @ingroup tmr4
- * @brief Defines the Custom Name for the \ref TMR4_OverflowCallbackRegister API
+ * @brief Defines the Custom Name for the \ref TMR4_MaxCountGet API.
  */
-#define Timer4_OverflowCallbackRegister TMR4_OverflowCallbackRegister
-
+/* cppcheck-suppress misra-c2012-2.5 */
+#define Timer4_MaxCountGet TMR4_MaxCountGet
 /**
  * @ingroup tmr4
- * @brief Defines the Custom Name for the \ref TMR4_Tasks API
+ * @brief Defines the Custom Name for the \ref TMR4_ModeSet API.
  */
+/* cppcheck-suppress misra-c2012-2.5 */
+#define Timer4_ModeSet TMR4_ModeSet
+/**
+ * @ingroup tmr4
+ * @brief Defines the Custom Name for the \ref TMR4_ExtResetSourceSet API.
+ */
+/* cppcheck-suppress misra-c2012-2.5 */
+#define Timer4_ExtResetSourceSet TMR4_ExtResetSourceSet
+/**
+ * @ingroup tmr4
+ * @brief Defines the Custom Name for the \ref TMR4_PeriodMatchCallbackRegister API.
+ */
+ /* cppcheck-suppress misra-c2012-2.5 */
+#define Timer4_PeriodMatchCallbackRegister TMR4_PeriodMatchCallbackRegister
+/**
+ * @ingroup tmr4
+ * @brief Defines the Custom Name for the \ref TMR4_PeriodMatchStatusGet API.
+ */
+/* cppcheck-suppress misra-c2012-2.5 */
+#define Timer4_PeriodMatchStatusGet TMR4_PeriodMatchStatusGet
+/**
+ * @ingroup tmr4
+ * @brief Defines the Custom Name for the \ref TMR4_PeriodMatchStatusClear API.
+ */
+/* cppcheck-suppress misra-c2012-2.5 */
+#define Timer4_PeriodMatchStatusClear TMR4_PeriodMatchStatusClear
+/**
+ * @ingroup tmr4
+ * @brief Defines the Custom Name for the \ref TMR4_Tasks API.
+ */
+/* cppcheck-suppress misra-c2012-2.5 */
 #define Timer4_Tasks TMR4_Tasks
-
-/**
- @ingroup tmr4
- @struct TMR_INTERFACE
- @brief This is an instance of TMR_INTERFACE for TMR4 module.
- */
-extern const struct TMR_INTERFACE Timer4;
 
 /**
  * @ingroup tmr4
  * @enum TMR4_HLT_EXT_RESET_SOURCE
- * @brief Defines the several modes of operation of the timer with the HLT extension.
+ * @brief Defines the several modes of timer's operation of the timer with the Hardware Limit Timer (HLT) extension.
  */
 typedef enum
 {
-
 	/* Roll-over Pulse mode clears the TMRx upon TMRx = PRx, then continue running.
 	ON bit must be set and is not affected by Resets
 	*/
@@ -242,7 +289,7 @@ typedef enum
 /**
  * @ingroup tmr4
  * @enum TMR4_HLT_EXT_RESET_SOURCE
- * @brief Defines the different reset sources of the HLT.
+ * @brief Defines the different Reset sources of the HLT.
  */
 typedef enum
 {
@@ -354,7 +401,8 @@ typedef enum
 
 /**
  * @ingroup tmr4
- * @brief Initializes the TMR4 module. This routine must be called before any other timer routines.
+ * @brief Initializes the Timer4 (TMR4) module.
+ *        This routine must be called before any other TMR4 routines.
  * @param None.
  * @return None.
  */
@@ -362,26 +410,16 @@ void TMR4_Initialize(void);
 
 /**
  * @ingroup tmr4
- * @brief Configures the Hardware Limit Timer (HLT) mode.
- * @pre The TMR4 should be initialized with TMR4_Initialize after calling this API.
- * @param mode - Value to write into T4HLTbits.MODE bits.
+ * @brief Deinitializes the TMR4 to Power-on Reset (POR) values.
+ * @param None.
  * @return None.
  */
-void TMR4_ModeSet(TMR4_HLT_MODE mode);
+void TMR4_Deinitialize(void);
 
 /**
  * @ingroup tmr4
- * @brief Configures the HLT external reset source.
- * @pre The TMR4 should be initialized with TMR4_Initialize after calling this API.
- * @param reset - Value to write into T4RSTbits.RSEL bits.
- * @return None.
- */
-void TMR4_ExtResetSourceSet(TMR4_HLT_EXT_RESET_SOURCE reset);
-
-/**
- * @ingroup tmr4
- * @brief Starts TMR4.
- * @pre The TMR4 should be initialized with TMR4_Initialize() before calling this API.
+ * @brief Starts the TMR4 timer.
+ * @pre Initialize TMR4 with TMR4_Initialize() before calling this API.
  * @param None.
  * @return None.
  */
@@ -389,8 +427,8 @@ void TMR4_Start(void);
 
 /**
  * @ingroup tmr4
- * @brief Stops TMR4.
- * @pre The TMR4 should be initialized with TMR4_Initialize() before calling this API.
+ * @brief Stops the TMR4 timer.
+ * @pre Initialize TMR4 with TMR4_Initialize() before calling this API.
  * @param None.
  * @return None.
  */
@@ -398,46 +436,96 @@ void TMR4_Stop(void);
 
 /**
  * @ingroup tmr4
- * @brief Reads the 8-bit from the TMR4 register.
- * @pre The TMR4 should be initialized with TMR4_Initialize() before calling this API.
+ * @brief Returns the current counter value.
+ * @pre Initialize TMR4 with TMR4_Initialize() before calling this API.
  * @param None.
- * @return 8-bit data from the TMR4 register.
+ * @return Current counter value
  */
-uint8_t TMR4_Read(void);
+uint8_t TMR4_CounterGet(void);
 
 /**
  * @ingroup tmr4
- * @brief Writes the 8-bit value to the TMR4 register.
- * @pre The TMR4 should be initialized with TMR4_Initialize() before calling this API.
- * @param timerVal - 8-bit value written to the TMR4 register.
+ * @brief Sets the counter value for the TMR4 timer.
+ * @pre Initialize TMR4 with TMR4_Initialize() before calling this API.
+ * @param count - Counter value to be written to the T4TMR register
  * @return None.
  */
-void TMR4_Write(uint8_t timerVal);
+void TMR4_CounterSet(uint8_t count);
 
 /**
  * @ingroup tmr4
- * @brief Loads the 8-bit value to the PR4 register.
- * @pre The TMR4 should be initialized with TMR4_Initialize() before calling this API.
- * @param periodVal - 8-bit value written to the PR4 register.
+ * @brief Sets the period count value.
+ * @pre Initialize TMR4 with TMR4_Initialize() before calling this API.
+ * @param periodVal - Period count value to be written to the T4PR register
  * @return None.
  */
-void TMR4_PeriodCountSet(size_t periodVal);
+void TMR4_PeriodSet(uint8_t periodVal);
 
 /**
  * @ingroup tmr4
- * @brief Setter function for the TMR4 overflow callback.
- * @param CallbackHandler - Pointer to the custom callback.
+ * @brief Returns the current period count value.
+ * @pre Initialize TMR4 with TMR4_Initialize() before calling this API.
+ * @param None.
+ * @return Period count value from the T4PR register
+ */
+uint8_t TMR4_PeriodGet(void);
+
+/**
+ * @ingroup tmr4
+ * @brief Returns the TMR4 maximum count value.
+ * @param None.
+ * @return Maximum count value of the timer
+ */
+uint8_t TMR4_MaxCountGet(void);
+
+/**
+ * @ingroup tmr4
+ * @brief Sets the HLT mode.
+ * @pre Initialize TMR4 with TMR4_Initialize() after calling this API.
+ * @param mode - Value to be written to the T4HLTbits.MODE bits
  * @return None.
  */
-void TMR4_OverflowCallbackRegister(void (* InterruptHandler)(void));
+void TMR4_ModeSet(TMR4_HLT_MODE mode);
 
 /**
  * @ingroup tmr4
- * @brief Performs the tasks to be executed on timer overflow event.
+ * @brief Sets the HLT External Reset source.
+ * @pre Initialize TMR4 with TMR4_Initialize() before calling this API.
+ * @param reset - Value to be written to the T4RSTbits.RSEL bits
+ * @return None.
+ */
+void TMR4_ExtResetSourceSet(TMR4_HLT_EXT_RESET_SOURCE reset);
+
+/**
+ * @ingroup tmr4
+ * @brief Returns the status of the TMR4 Period Match Interrupt flag.
+ * @param None.
+ * @return Interrupt flag status
+ */
+bool TMR4_PeriodMatchStatusGet(void);
+
+/**
+ * @ingroup tmr4
+ * @brief Clears the TMR4 Period Match Interrupt flag.
+ * @param None.
+ * @return None.
+ */
+void TMR4_PeriodMatchStatusClear(void);
+
+/**
+ * @ingroup tmr4
+ * @brief Performs tasks to be executed during the TMR4 period match event.
  * @param None.
  * @return None.
  */
 void TMR4_Tasks(void);
+/**
+ * @ingroup tmr4
+ * @brief Registers a callback function for the TMR4 period match event.
+ * @param CallbackHandler - Address of the custom callback function
+ * @return None.
+ */
+void TMR4_PeriodMatchCallbackRegister(void (* callbackHandler)(void));
 
 #endif // TMR4_H
 /**

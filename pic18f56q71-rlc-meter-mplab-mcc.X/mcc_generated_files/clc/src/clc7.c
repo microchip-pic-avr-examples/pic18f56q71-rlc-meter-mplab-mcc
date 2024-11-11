@@ -7,7 +7,7 @@
  * 
  * @brief This file contains the API implementations for the CLC7 driver.
  *
- * @version CLC7 Driver Version 1.1.0
+ * @version CLC7 Driver Version 1.2.0
 */
 /*
 © [2024] Microchip Technology Inc. and its subsidiaries.
@@ -34,6 +34,9 @@
 #include <xc.h>
 #include "../clc7.h"
 
+
+static void (*CLC7_Callback)(void);
+static void CLC7_DefaultCallback(void);
 
 void CLC7_Initialize(void) 
 {
@@ -63,16 +66,70 @@ void CLC7_Initialize(void)
     // LCMODE 1-input D flip-flop with S and R; LCINTN disabled; LCINTP disabled; LCEN enabled; 
     CLCnCON = 0x84;
 
+    //Set default callback for CLC7 interrupt Overflow.
+    CLC7_CallbackRegister(CLC7_DefaultCallback);
+
+    // Clear the CLC interrupt flag
+    PIR6bits.CLC7IF = 0;
 }
 
 void CLC7_Enable(void) 
 {
+    CLCSELECTbits.SLCT = 6;
     CLCnCONbits.EN = 1;
 }
 
 void CLC7_Disable(void) 
 {
+    CLCSELECTbits.SLCT = 6;
     CLCnCONbits.EN = 0;
+}
+
+void CLC7_RisingEdgeDetectionEnable(void) 
+{
+    CLCSELECTbits.SLCT = 6;
+    CLCnCONbits.INTP = 1;
+}
+
+void CLC7_RisingEdgeDetectionDisable(void) 
+{
+    CLCSELECTbits.SLCT = 6;
+    CLCnCONbits.INTP = 0;
+}
+
+void CLC7_FallingEdgeDetectionEnable(void) 
+{
+    CLCSELECTbits.SLCT = 6;
+    CLCnCONbits.INTN = 1;
+}
+
+void CLC7_FallingEdgeDetectionDisable(void) 
+{
+    CLCSELECTbits.SLCT = 6;
+    CLCnCONbits.INTN = 0;
+}
+
+void CLC7_CallbackRegister(void (* CallbackHandler)(void))
+{
+    CLC7_Callback = CallbackHandler;
+}
+
+static void CLC7_DefaultCallback(void)
+{
+    //Add your interrupt code here or
+    //Use CLC7_CallbackRegister function to use Custom ISR
+}
+
+void CLC7_Tasks(void)
+{
+    if(PIR6bits.CLC7IF == 1)
+    {
+        if(CLC7_Callback != NULL)
+        {
+            CLC7_Callback();
+        }
+        PIR6bits.CLC7IF = 0;
+    }
 }
 
 

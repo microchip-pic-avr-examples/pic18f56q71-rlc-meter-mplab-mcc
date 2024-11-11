@@ -7,7 +7,7 @@
   *
   * @brief This file contains the driver code for the SPI1 module.
   *
-  * @version SPI1 Driver Version v3.1.0.
+  * @version SPI1 Driver Version v3.1.1.
 */
 
 /*
@@ -61,7 +61,7 @@ const struct SPI_INTERFACE SPI1_Host = {
 
 //con0 == SPI1CON0, con1 == SPI1CON1, con2 == SPI1CON2, baud == SPI1BAUD, clksel == SPI1CLKSEL
 static const spi_configuration_t spi1_configuration[] = {   
-    { 0x2, 0x40, 0x0, 0x4, 0x0 },
+    { 0x2, 0x40, 0x0, 0x1f, 0x0 },
     { 0x2, 0x40, 0x0, 0x0, 0x0 }
 };
 
@@ -72,12 +72,14 @@ void SPI1_Initialize(void)
     PIE3bits.SPI1TXIE 	= 0U;
     PIE3bits.SPI1RXIE 	= 0U;
 	
-	//Clear all registers to reset value
-    SPI1CON0 = 0x00U;
-    SPI1CON1 = 0x00U;
-    SPI1CON2 = 0x00U;
-    SPI1BAUD = 0x00U;
-    SPI1CLK = 0x00U;
+	//Registers set to power-on-reset value
+    SPI1CON0 = 0x0;
+    SPI1CON1 = 0x4;
+    SPI1CON2 = 0x0;
+    SPI1BAUD = 0x0;
+    SPI1CLK = 0x0;
+	SPI1STATUSbits.CLRBF = 1U;
+
 }
 
 void SPI1_Deinitialize(void)
@@ -97,7 +99,6 @@ bool SPI1_Open(uint8_t spiConfigIndex)
         SPI1CLK = spi1_configuration[spiConfigIndex].clksel;        
 		TRISCbits.TRISC6 = 0;
         SPI1CON0bits.EN = 1U;
-		
 		returnValue = true;
 	}
 	else
@@ -110,18 +111,26 @@ bool SPI1_Open(uint8_t spiConfigIndex)
 void SPI1_Close(void)
 {
 	SPI1CON0bits.EN = 0U;
+	PIE3bits.SPI1IE 		= 0U;
+    PIE3bits.SPI1TXIE 	= 0U;
+    PIE3bits.SPI1RXIE 	= 0U;
 }
 
 void SPI1_BufferExchange(void *bufferData, size_t bufferSize)
 {
 	uint8_t* bufferInput = bufferData;
 
-	//Load the transfer count register
+    SPI1STATUSbits.CLRBF = 1U;
+
+	//Clear the TCZIF interrupt flag
+	SPI1INTFbits.TCZIF = 0U;
+
+	//Set as full duplex mode for buffer exchange operation
+    SPI1CON2 = (SPI1CON2 | _SPI1CON2_SPI1RXR_MASK) | _SPI1CON2_SPI1TXR_MASK;
+	
+	//Load the transfer count registers
 	SPI1TCNTH = (uint8_t)(bufferSize>>8);
 	SPI1TCNTL = (uint8_t)(bufferSize);	
-	
-	//Set both SPI as full duplex mode for buffer exchange operation
-    SPI1CON2 = ((SPI1CON2) | (_SPI1CON2_SPI1RXR_MASK) | (_SPI1CON2_SPI1TXR_MASK));
 	
 	while(0U == SPI1INTFbits.TCZIF)
 	{
@@ -136,21 +145,25 @@ void SPI1_BufferExchange(void *bufferData, size_t bufferSize)
 		*bufferInput = SPI1RXB;		
 		bufferInput++;
 	}
-	//Clear the TCZIF interrupt flag
-	SPI1INTFbits.TCZIF = 0U;
 }
 
 void SPI1_BufferWrite(void *bufferData, size_t bufferSize)
 {
 	uint8_t* bufferInput = bufferData;
 
-	//Load the transfer count register
+	SPI1STATUSbits.CLRBF = 1U;
+
+	//Clear the TCZIF interrupt flag
+	SPI1INTFbits.TCZIF = 0U;
+
+	//Set as transmit only mode for buffer write operation
+    SPI1CON2 = (SPI1CON2 & ~_SPI1CON2_SPI1RXR_MASK) | _SPI1CON2_SPI1TXR_MASK;
+   
+	//Load the transfer count registers
 	SPI1TCNTH = (uint8_t)(bufferSize>>8);
 	SPI1TCNTL = (uint8_t)(bufferSize);
 
-	//Set both SPI as transmit only mode for buffer write operation
-    SPI1CON2 = (SPI1CON2 & ~(_SPI1CON2_SPI1RXR_MASK)) | (_SPI1CON2_SPI1TXR_MASK);
-   
+	
 	while(0U == SPI1INTFbits.TCZIF)
 	{
 		//Write input data to SPI transmit buffer register
@@ -160,69 +173,81 @@ void SPI1_BufferWrite(void *bufferData, size_t bufferSize)
 			//Wait on transmit interrupt flag to be set
         };
 		bufferInput++;
-	}	
-	//Clear the TCZIF interrupt flag
-	SPI1INTFbits.TCZIF = 0U;
+	}
 }
 
 void SPI1_BufferRead(void *bufferData, size_t bufferSize)
 {
 	uint8_t* bufferInput = bufferData;
+
+	SPI1STATUSbits.CLRBF = 1U;
+
+	//Clear the TCZIF interrupt flag
+	SPI1INTFbits.TCZIF = 0U;
+
+	//Set as receive only mode for buffer read operation
+    SPI1CON2 = (SPI1CON2 & ~_SPI1CON2_SPI1TXR_MASK) | _SPI1CON2_SPI1RXR_MASK;
 	
-	//Load the transfer count register
+	//Load the transfer count registers
 	SPI1TCNTH = (uint8_t)(bufferSize>>8);
 	SPI1TCNTL = (uint8_t)(bufferSize);
 
-	//Set both SPI as receive only mode for buffer read operation
-    SPI1CON2 = (SPI1CON2 | (_SPI1CON2_SPI1RXR_MASK)) & ~(_SPI1CON2_SPI1TXR_MASK);
 	while(0U == SPI1INTFbits.TCZIF)
 	{
-		//Write dummy data to SPI transmit buffer register
-		SPI1TXB = 0x00U;
 		while(!PIR3bits.SPI1RXIF)
 		{
             //Wait on receive interrupt flag to be set
         };
+
 		//Store received data  from receive buffer register 
 		*bufferInput = SPI1RXB;
 		bufferInput++;
 	}
-	//Clear the TCZIF interrupt flag
-	SPI1INTFbits.TCZIF = 0U;
 }
 
 uint8_t SPI1_ByteExchange(uint8_t byteData)
 {
-    SPI1CON2 = SPI1CON2 | _SPI1CON2_SPI1RXR_MASK | _SPI1CON2_SPI1TXR_MASK;
-    uint8_t returnValue = 0U;
-	SPI1TCNTL = 1;
-	//Write input data to SPI transmit buffer register
+	uint8_t returnValue = 0U;
+    
+	SPI1STATUSbits.CLRBF = 1U;
+
+	//Set as full duplex mode
+	SPI1CON2 = SPI1CON2 | _SPI1CON2_SPI1RXR_MASK | _SPI1CON2_SPI1TXR_MASK;
+	
+	//Load the transfer count registers
+	SPI1TCNTH = 0U;
+	SPI1TCNTL = 1U;
+
 	SPI1TXB = byteData;
+
 	while(!PIR3bits.SPI1RXIF)
 	{
 		//Wait on receive interrupt flag to be set
-    };	
-	
-	//Store received data  from receive buffer register 
+    };
 	returnValue = SPI1RXB;
-	
 	return returnValue;
 }
 
 void SPI1_ByteWrite(uint8_t byteData)
 {	
+	//Set as full duplex mode
 	SPI1CON2 = SPI1CON2 | _SPI1CON2_SPI1RXR_MASK | _SPI1CON2_SPI1TXR_MASK;
+	
+	//Load the transfer count registers
+	SPI1TCNTH = 0;
 	SPI1TCNTL = 1;
-	//Write input data to SPI transmit buffer register
+	
 	SPI1TXB = byteData;
 }
 
 uint8_t SPI1_ByteRead(void)
 {
 	uint8_t returnValue = 0x00U;
+	
+	//Set as full duplex mode
     SPI1CON2 = SPI1CON2 | _SPI1CON2_SPI1RXR_MASK | _SPI1CON2_SPI1TXR_MASK;
-
-	//Store received data  from receive buffer register 
+	
+	//Store received data from receive buffer register 
 	returnValue = SPI1RXB;	
 	return returnValue;
 }

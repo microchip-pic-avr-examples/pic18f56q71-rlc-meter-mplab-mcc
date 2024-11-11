@@ -9,11 +9,12 @@
                      projectFiles="true">
         <logicalFolder name="adc" displayName="adc" projectFiles="true">
           <itemPath>mcc_generated_files/adc/adc.h</itemPath>
+          <itemPath>mcc_generated_files/adc/adc_types.h</itemPath>
         </logicalFolder>
         <logicalFolder name="clc" displayName="clc" projectFiles="true">
+          <itemPath>mcc_generated_files/clc/clc6.h</itemPath>
           <itemPath>mcc_generated_files/clc/clc8.h</itemPath>
           <itemPath>mcc_generated_files/clc/clc7.h</itemPath>
-          <itemPath>mcc_generated_files/clc/clc6.h</itemPath>
           <itemPath>mcc_generated_files/clc/clc1.h</itemPath>
           <itemPath>mcc_generated_files/clc/clc3.h</itemPath>
         </logicalFolder>
@@ -25,11 +26,11 @@
           <itemPath>mcc_generated_files/dma/dma1.h</itemPath>
           <itemPath>mcc_generated_files/dma/dma3.h</itemPath>
         </logicalFolder>
-        <logicalFolder name="opa" displayName="opa" projectFiles="true">
-          <itemPath>mcc_generated_files/opa/opa1.h</itemPath>
-          <itemPath>mcc_generated_files/opa/opa2.h</itemPath>
+        <logicalFolder name="nvm" displayName="nvm" projectFiles="true">
+          <itemPath>mcc_generated_files/nvm/nvm.h</itemPath>
         </logicalFolder>
         <logicalFolder name="pwm" displayName="pwm" projectFiles="true">
+          <itemPath>mcc_generated_files/pwm/pwm2_16bit.h</itemPath>
           <itemPath>mcc_generated_files/pwm/pwm1_16bit.h</itemPath>
         </logicalFolder>
         <logicalFolder name="spi" displayName="spi" projectFiles="true">
@@ -38,34 +39,38 @@
           <itemPath>mcc_generated_files/spi/spi_polling_types.h</itemPath>
         </logicalFolder>
         <logicalFolder name="system" displayName="system" projectFiles="true">
-          <itemPath>mcc_generated_files/system/pins.h</itemPath>
-          <itemPath>mcc_generated_files/system/clock.h</itemPath>
           <itemPath>mcc_generated_files/system/system.h</itemPath>
           <itemPath>mcc_generated_files/system/interrupt.h</itemPath>
+          <itemPath>mcc_generated_files/system/pins.h</itemPath>
+          <itemPath>mcc_generated_files/system/clock.h</itemPath>
           <itemPath>mcc_generated_files/system/config_bits.h</itemPath>
         </logicalFolder>
         <logicalFolder name="timer" displayName="timer" projectFiles="true">
-          <itemPath>mcc_generated_files/timer/timer_interface.h</itemPath>
           <itemPath>mcc_generated_files/timer/tmr0.h</itemPath>
           <itemPath>mcc_generated_files/timer/tmr4.h</itemPath>
+          <itemPath>mcc_generated_files/timer/tmr2.h</itemPath>
+          <itemPath>mcc_generated_files/timer/tmr2_deprecated.h</itemPath>
+          <itemPath>mcc_generated_files/timer/tmr4_deprecated.h</itemPath>
+          <itemPath>mcc_generated_files/timer/tmr0_deprecated.h</itemPath>
         </logicalFolder>
         <logicalFolder name="uart" displayName="uart" projectFiles="true">
-          <itemPath>mcc_generated_files/uart/uart_types.h</itemPath>
           <itemPath>mcc_generated_files/uart/uart2.h</itemPath>
           <itemPath>mcc_generated_files/uart/uart_drv_interface.h</itemPath>
+          <itemPath>mcc_generated_files/uart/uart_types.h</itemPath>
         </logicalFolder>
       </logicalFolder>
+      <itemPath>mcp6s26.h</itemPath>
       <itemPath>rlc.h</itemPath>
-      <itemPath>GUI_Paint.h</itemPath>
-      <itemPath>LCD_Driver.h</itemPath>
+      <itemPath>OLEDC_Click.h</itemPath>
+      <itemPath>OLEDC_colors.h</itemPath>
+      <itemPath>OLEDC_shapes.h</itemPath>
       <itemPath>display.h</itemPath>
-      <itemPath>font.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="true">
       <itemPath>Makefile</itemPath>
-      <itemPath>pic18f56q71-cnano-lc-meter-mplab-mcc.mc3</itemPath>
+      <itemPath>pic18f56q71-rlc-meter-mplab-mcc.mc3</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -84,11 +89,11 @@
         </logicalFolder>
         <logicalFolder name="clc" displayName="clc" projectFiles="true">
           <logicalFolder name="src" displayName="src" projectFiles="true">
-            <itemPath>mcc_generated_files/clc/src/clc8.c</itemPath>
-            <itemPath>mcc_generated_files/clc/src/clc7.c</itemPath>
-            <itemPath>mcc_generated_files/clc/src/clc6.c</itemPath>
             <itemPath>mcc_generated_files/clc/src/clc1.c</itemPath>
+            <itemPath>mcc_generated_files/clc/src/clc6.c</itemPath>
             <itemPath>mcc_generated_files/clc/src/clc3.c</itemPath>
+            <itemPath>mcc_generated_files/clc/src/clc7.c</itemPath>
+            <itemPath>mcc_generated_files/clc/src/clc8.c</itemPath>
           </logicalFolder>
         </logicalFolder>
         <logicalFolder name="dac" displayName="dac" projectFiles="true">
@@ -103,14 +108,14 @@
             <itemPath>mcc_generated_files/dma/src/dma3.c</itemPath>
           </logicalFolder>
         </logicalFolder>
-        <logicalFolder name="opa" displayName="opa" projectFiles="true">
+        <logicalFolder name="nvm" displayName="nvm" projectFiles="true">
           <logicalFolder name="src" displayName="src" projectFiles="true">
-            <itemPath>mcc_generated_files/opa/src/opa2.c</itemPath>
-            <itemPath>mcc_generated_files/opa/src/opa1.c</itemPath>
+            <itemPath>mcc_generated_files/nvm/src/nvm.c</itemPath>
           </logicalFolder>
         </logicalFolder>
         <logicalFolder name="pwm" displayName="pwm" projectFiles="true">
           <logicalFolder name="src" displayName="src" projectFiles="true">
+            <itemPath>mcc_generated_files/pwm/src/pwm2_16bit.c</itemPath>
             <itemPath>mcc_generated_files/pwm/src/pwm1_16bit.c</itemPath>
           </logicalFolder>
         </logicalFolder>
@@ -121,17 +126,18 @@
         </logicalFolder>
         <logicalFolder name="system" displayName="system" projectFiles="true">
           <logicalFolder name="src" displayName="src" projectFiles="true">
-            <itemPath>mcc_generated_files/system/src/system.c</itemPath>
-            <itemPath>mcc_generated_files/system/src/config_bits.c</itemPath>
-            <itemPath>mcc_generated_files/system/src/pins.c</itemPath>
             <itemPath>mcc_generated_files/system/src/interrupt.c</itemPath>
+            <itemPath>mcc_generated_files/system/src/pins.c</itemPath>
             <itemPath>mcc_generated_files/system/src/clock.c</itemPath>
+            <itemPath>mcc_generated_files/system/src/config_bits.c</itemPath>
+            <itemPath>mcc_generated_files/system/src/system.c</itemPath>
           </logicalFolder>
         </logicalFolder>
         <logicalFolder name="timer" displayName="timer" projectFiles="true">
           <logicalFolder name="src" displayName="src" projectFiles="true">
             <itemPath>mcc_generated_files/timer/src/tmr0.c</itemPath>
             <itemPath>mcc_generated_files/timer/src/tmr4.c</itemPath>
+            <itemPath>mcc_generated_files/timer/src/tmr2.c</itemPath>
           </logicalFolder>
         </logicalFolder>
         <logicalFolder name="uart" displayName="uart" projectFiles="true">
@@ -141,9 +147,10 @@
         </logicalFolder>
       </logicalFolder>
       <itemPath>main.c</itemPath>
+      <itemPath>mcp6s26.c</itemPath>
       <itemPath>rlc.c</itemPath>
-      <itemPath>GUI_Paint.c</itemPath>
-      <itemPath>LCD_Driver.c</itemPath>
+      <itemPath>OLEDC_Click.c</itemPath>
+      <itemPath>OLEDC_shapes.c</itemPath>
       <itemPath>display.c</itemPath>
     </logicalFolder>
   </logicalFolder>
@@ -160,7 +167,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>nEdbgTool</platformTool>
         <languageToolchain>XC8</languageToolchain>
-        <languageToolchainVersion>2.46</languageToolchainVersion>
+        <languageToolchainVersion>2.50</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <packs>
@@ -207,10 +214,10 @@
         <property key="garbage-collect-functions" value="true"/>
         <property key="identifier-length" value="255"/>
         <property key="local-generation" value="false"/>
-        <property key="operation-mode" value="pro"/>
+        <property key="operation-mode" value="free"/>
         <property key="opt-xc8-compiler-strict_ansi" value="false"/>
         <property key="optimization-assembler" value="true"/>
-        <property key="optimization-assembler-files" value="false"/>
+        <property key="optimization-assembler-files" value="true"/>
         <property key="optimization-debug" value="false"/>
         <property key="optimization-invariant-enable" value="false"/>
         <property key="optimization-invariant-value" value="16"/>
@@ -225,7 +232,7 @@
         <property key="use-iar" value="false"/>
         <property key="verbose" value="false"/>
         <property key="warning-level" value="-3"/>
-        <property key="what-to-do" value="ignore"/>
+        <property key="what-to-do" value="require"/>
       </HI-TECH-COMP>
       <HI-TECH-LINK>
         <property key="additional-options-checksum" value=""/>
@@ -283,7 +290,7 @@
         <property key="communication.speed" value="${communication.speed.default}"/>
         <property key="debugoptions.debug-startup" value="Use system settings"/>
         <property key="debugoptions.reset-behaviour" value="Use system settings"/>
-        <property key="debugoptions.useswbreakpoints" value="true"/>
+        <property key="debugoptions.useswbreakpoints" value="false"/>
         <property key="event.recorder.debugger.behavior" value="Running"/>
         <property key="event.recorder.enabled" value="false"/>
         <property key="event.recorder.scvd.files" value=""/>
@@ -307,9 +314,9 @@
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-ffff"/>
-        <property key="poweroptions.powerenable" value="false"/>
+        <property key="poweroptions.powerenable" value="true"/>
         <property key="programmerToGoFilePath"
-                  value="C:/work/Temp/PIC18F56Q71/LC Meter Work/New Repo/pic18f56q71-rlc-meter-mplab-mcc.X/debug/default/pic18f56q71-rlc-meter-mplab-mcc_ptg"/>
+                  value="C:/Users/M75512/OneDrive - Microchip Technology Inc/work/Temp/PIC18F56Q71/RLC Meter Board Application/pic18f56q71-rlc-meter-board.X/debug/default/pic18f56q71-rlc-meter-board_ptg"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.preservedataflash" value="false"/>
         <property key="programoptions.preservedataflash.ranges"
@@ -332,7 +339,7 @@
       </XC8-CO>
       <XC8-config-global>
         <property key="advanced-elf" value="true"/>
-        <property key="constdata-progmem" value="true"/>
+        <property key="constdata-progmem" value="false"/>
         <property key="gcc-opt-driver-new" value="true"/>
         <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
@@ -357,7 +364,7 @@
         <property key="communication.speed" value="${communication.speed.default}"/>
         <property key="debugoptions.debug-startup" value="Use system settings"/>
         <property key="debugoptions.reset-behaviour" value="Use system settings"/>
-        <property key="debugoptions.useswbreakpoints" value="true"/>
+        <property key="debugoptions.useswbreakpoints" value="false"/>
         <property key="event.recorder.debugger.behavior" value="Running"/>
         <property key="event.recorder.enabled" value="false"/>
         <property key="event.recorder.scvd.files" value=""/>
@@ -381,9 +388,9 @@
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-ffff"/>
-        <property key="poweroptions.powerenable" value="false"/>
+        <property key="poweroptions.powerenable" value="true"/>
         <property key="programmerToGoFilePath"
-                  value="C:/work/Temp/PIC18F56Q71/LC Meter Work/New Repo/pic18f56q71-rlc-meter-mplab-mcc.X/debug/default/pic18f56q71-rlc-meter-mplab-mcc_ptg"/>
+                  value="C:/Users/M75512/OneDrive - Microchip Technology Inc/work/Temp/PIC18F56Q71/RLC Meter Board Application/Release/pic18f56q71-rlc-meter-mplab-mcc.X/debug/free/pic18f56q71-rlc-meter-mplab-mcc_ptg"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.preservedataflash" value="false"/>
         <property key="programoptions.preservedataflash.ranges"
@@ -409,7 +416,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>nEdbgTool</platformTool>
         <languageToolchain>XC8</languageToolchain>
-        <languageToolchainVersion>2.46</languageToolchainVersion>
+        <languageToolchainVersion>2.50</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <packs>
@@ -459,7 +466,7 @@
         <property key="operation-mode" value="pro"/>
         <property key="opt-xc8-compiler-strict_ansi" value="false"/>
         <property key="optimization-assembler" value="true"/>
-        <property key="optimization-assembler-files" value="false"/>
+        <property key="optimization-assembler-files" value="true"/>
         <property key="optimization-debug" value="false"/>
         <property key="optimization-invariant-enable" value="false"/>
         <property key="optimization-invariant-value" value="16"/>
@@ -474,7 +481,7 @@
         <property key="use-iar" value="false"/>
         <property key="verbose" value="false"/>
         <property key="warning-level" value="-3"/>
-        <property key="what-to-do" value="ignore"/>
+        <property key="what-to-do" value="require"/>
       </HI-TECH-COMP>
       <HI-TECH-LINK>
         <property key="additional-options-checksum" value=""/>
@@ -532,7 +539,7 @@
         <property key="communication.speed" value="${communication.speed.default}"/>
         <property key="debugoptions.debug-startup" value="Use system settings"/>
         <property key="debugoptions.reset-behaviour" value="Use system settings"/>
-        <property key="debugoptions.useswbreakpoints" value="true"/>
+        <property key="debugoptions.useswbreakpoints" value="false"/>
         <property key="event.recorder.debugger.behavior" value="Running"/>
         <property key="event.recorder.enabled" value="false"/>
         <property key="event.recorder.scvd.files" value=""/>
@@ -556,9 +563,9 @@
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-ffff"/>
-        <property key="poweroptions.powerenable" value="false"/>
+        <property key="poweroptions.powerenable" value="true"/>
         <property key="programmerToGoFilePath"
-                  value="C:/work/Temp/PIC18F56Q71/LC Meter Work/New Repo/pic18f56q71-rlc-meter-mplab-mcc.X/debug/default/pic18f56q71-rlc-meter-mplab-mcc_ptg"/>
+                  value="C:/Users/M75512/OneDrive - Microchip Technology Inc/work/Temp/PIC18F56Q71/RLC Meter Board Application/pic18f56q71-rlc-meter-board.X/debug/default/pic18f56q71-rlc-meter-board_ptg"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.preservedataflash" value="false"/>
         <property key="programoptions.preservedataflash.ranges"
@@ -581,7 +588,7 @@
       </XC8-CO>
       <XC8-config-global>
         <property key="advanced-elf" value="true"/>
-        <property key="constdata-progmem" value="true"/>
+        <property key="constdata-progmem" value="false"/>
         <property key="gcc-opt-driver-new" value="true"/>
         <property key="gcc-opt-std" value="-std=c99"/>
         <property key="gcc-output-file-format" value="dwarf-3"/>
@@ -606,7 +613,7 @@
         <property key="communication.speed" value="${communication.speed.default}"/>
         <property key="debugoptions.debug-startup" value="Use system settings"/>
         <property key="debugoptions.reset-behaviour" value="Use system settings"/>
-        <property key="debugoptions.useswbreakpoints" value="true"/>
+        <property key="debugoptions.useswbreakpoints" value="false"/>
         <property key="event.recorder.debugger.behavior" value="Running"/>
         <property key="event.recorder.enabled" value="false"/>
         <property key="event.recorder.scvd.files" value=""/>
@@ -630,9 +637,7 @@
                   value="${memories.instruction.ram.ranges}"/>
         <property key="memories.programmemory" value="true"/>
         <property key="memories.programmemory.ranges" value="0-ffff"/>
-        <property key="poweroptions.powerenable" value="false"/>
-        <property key="programmerToGoFilePath"
-                  value="C:/work/Temp/PIC18F56Q71/LC Meter Work/New Repo/pic18f56q71-rlc-meter-mplab-mcc.X/debug/default/pic18f56q71-rlc-meter-mplab-mcc_ptg"/>
+        <property key="poweroptions.powerenable" value="true"/>
         <property key="programoptions.eraseb4program" value="true"/>
         <property key="programoptions.preservedataflash" value="false"/>
         <property key="programoptions.preservedataflash.ranges"

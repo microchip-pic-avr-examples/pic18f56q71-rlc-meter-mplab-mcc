@@ -5,9 +5,11 @@
  * 
  * @ingroup  tmr4
  * 
- * @brief API implementations for the TMR4 module.
+ * @brief Driver implementation for the TMR4 module.
  *
- * @version TMR4 Driver Version 3.0.4
+ * @version Driver Version 4.0.0
+ *
+ * @version Package Version 5.0.0
  */
 
 /*
@@ -38,105 +40,127 @@
 #include <xc.h>
 #include "../tmr4.h"
 
-const struct TMR_INTERFACE Timer4 = {
-    .Initialize = TMR4_Initialize,
-    .Start = TMR4_Start,
-    .Stop = TMR4_Stop,
-    .PeriodCountSet = TMR4_PeriodCountSet,
-    .TimeoutCallbackRegister = TMR4_OverflowCallbackRegister,
-    .Tasks = TMR4_Tasks
-};
-
-static void (*TMR4_OverflowCallback)(void);
-static void TMR4_DefaultOverflowCallback(void);
+static void (*TMR4_PeriodMatchCallback)(void);
+static void TMR4_DefaultPeriodMatchCallback(void);
 
 /**
   Section: TMR4 APIs
 */
 
-void TMR4_Initialize(void){
+void TMR4_Initialize(void)
+{
+    T4CLKCON = (19 << _T4CLKCON_T4CS_POSN);  // T4CS CLC8_OUT
 
-    // Set TMR4 to the options selected in the User Interface
-    // TCS CLC8_OUT; 
-    T4CLKCON = 0x13;
-    // TMODE Resets at TMR4_ers = 0; TCKSYNC Not Synchronized; TCKPOL Rising Edge; TPSYNC Not Synchronized; 
-    T4HLT = 0x6;
-    // TRSEL CLC6_out; 
-    T4RST = 0x14;
-    // PR 24; 
-    T4PR = 0x18;
-    // TMR 0x0; 
+    T4HLT = (6 << _T4HLT_T4MODE_POSN)   // T4MODE Resets at TMR4_ers = 0
+        | (0 << _T4HLT_T4CKSYNC_POSN)   // T4CKSYNC Not Synchronized
+        | (0 << _T4HLT_T4CKPOL_POSN)   // T4CKPOL Rising Edge
+        | (0 << _T4HLT_T4PSYNC_POSN);  // T4PSYNC Not Synchronized
+
+    T4RST = (20 << _T4RST_T4RSEL_POSN);  // T4RSEL CLC6_out
+
+    T4PR = 0xA;    // Period 0.000044s; Frequency 250000Hz; Count 10
+
     T4TMR = 0x0;
 
-    // Set default overflow callback
-    TMR4_OverflowCallbackRegister(TMR4_DefaultOverflowCallback);
-
-    // Clearing IF flag.
+    TMR4_PeriodMatchCallback = TMR4_DefaultPeriodMatchCallback;
+    
     PIR10bits.TMR4IF = 0;
-    // TCKPS 1:1; TMRON on; TOUTPS 1:1; 
-    T4CON = 0x80;
+
+    T4CON = (0 << _T4CON_T4CKPS_POSN)   // T4CKPS 1:1
+        | (1 << _T4CON_TMR4ON_POSN)   // TMR4ON on
+        | (0 << _T4CON_T4OUTPS_POSN);  // T4OUTPS 1:1
 }
 
-void TMR4_ModeSet(TMR4_HLT_MODE mode)
+void TMR4_Deinitialize(void)
 {
-   // Configure different types HLT mode
-    T4HLTbits.T4MODE = mode;
-}
-
-void TMR4_ExtResetSourceSet(TMR4_HLT_EXT_RESET_SOURCE reset)
-{
-    //Configure different types of HLT external reset source
-    T4RSTbits.T4RSEL = reset;
+    T4CONbits.TMR4ON = 0;
+    
+    PIR10bits.TMR4IF = 0;	   
+    PIE10bits.TMR4IE = 0;		
+    
+    T4CON = 0x0;
+    T4CLKCON = 0x0;
+    T4HLT = 0x0;
+    T4RST = 0x0;
+    T4PR = 0xFF;
+    T4TMR =0x0;
 }
 
 void TMR4_Start(void)
-{
-    // Start the Timer by writing to TMRxON bit
+{   
     T4CONbits.TMR4ON = 1;
 }
 
 void TMR4_Stop(void)
-{
-    // Stop the Timer by writing to TMRxON bit
+{   
     T4CONbits.TMR4ON = 0;
 }
 
-uint8_t TMR4_Read(void)
-{
-    uint8_t readVal;
-    readVal = TMR4;
-    return readVal;
+void TMR4_ModeSet(TMR4_HLT_MODE mode)
+{  
+    T4HLTbits.T4MODE = mode;
 }
 
-void TMR4_Write(uint8_t timerVal)
-{
-    // Write to the Timer4 register
-    TMR4 = timerVal;;
+void TMR4_ExtResetSourceSet(TMR4_HLT_EXT_RESET_SOURCE reset)
+{   
+    T4RSTbits.T4RSEL = reset;
 }
 
-void TMR4_PeriodCountSet(size_t periodVal)
+uint8_t TMR4_CounterGet(void)
 {
-   PR4 = (uint8_t) periodVal;
+    return T4TMR;
 }
 
-void TMR4_OverflowCallbackRegister(void (* InterruptHandler)(void))
-{
-   TMR4_OverflowCallback = InterruptHandler;
+void TMR4_CounterSet(uint8_t count)
+{  
+    T4TMR = count;
 }
 
-static void TMR4_DefaultOverflowCallback(void)
+void TMR4_PeriodSet(uint8_t periodVal)
 {
-    // add your TMR4 interrupt custom code
-    // or set custom function using TMR4_OverflowCallbackRegister()
+    T4PR = periodVal;
+}
+
+uint8_t TMR4_PeriodGet(void)
+{
+    return T4PR;
+}
+
+uint8_t TMR4_MaxCountGet(void)
+{
+    return TMR4_MAX_COUNT;
+}
+
+bool TMR4_PeriodMatchStatusGet(void)
+{
+    return PIR10bits.TMR4IF;
+}
+
+void TMR4_PeriodMatchStatusClear(void)
+{
+    PIR10bits.TMR4IF = 0;
 }
 
 void TMR4_Tasks(void)
 {
-    if(PIR10bits.TMR4IF)
+    if(1U == PIR10bits.TMR4IF)
     {
-        // Clearing IF flag.
+        if(NULL != TMR4_PeriodMatchCallback)
+        {
+            TMR4_PeriodMatchCallback();
+        }
         PIR10bits.TMR4IF = 0;
-       TMR4_OverflowCallback();
     }
 }
+
+void TMR4_PeriodMatchCallbackRegister(void (* callbackHandler)(void))
+{
+   TMR4_PeriodMatchCallback = callbackHandler;
+}
+
+static void TMR4_DefaultPeriodMatchCallback(void)
+{
+    // Default callback function
+}
+
 

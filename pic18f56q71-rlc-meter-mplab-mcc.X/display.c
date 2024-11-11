@@ -30,9 +30,20 @@
 
 #include "display.h"
 
-static enum COMPONENT displayedComponent = CAPACITOR; 
+const char* componentsLUT[3] = {"Cs", "Ls", "Rs"};
+const char* unitsLUT[3] = {"F", "H", "Ohm"};
 
-static void Print_Float_Number(uint16_t row, uint16_t column, float number)
+static enum COMPONENT displayedComponent = CAPACITOR;
+static enum COMPONENT oldComponent = CAPACITOR;
+
+static float oldValue;
+static float oldQ;
+static float oldZ;
+static float oldTheta;
+static char oldMultiplier[2];
+static char oldZMultiplier[2];
+
+static void Print_Float_Number(float number, uint16_t line, uint16_t column, uint16_t color)
 {
     char buffer[10];
     
@@ -44,33 +55,48 @@ static void Print_Float_Number(uint16_t row, uint16_t column, float number)
     {
         sprintf(buffer,"% -8.2f", number);
     }
-    Paint_DrawString_EN(column, row, buffer, BLACK, WHITE);
+    
+    oledC_printString(buffer, line, column, color);
 }
 
 void Display_Init(void)
 {
-    LCD_Init();
-    LCD_SetBacklight();
-    
-    Paint_NewImage(LCD_WIDTH, LCD_HEIGHT, 270, BLACK);
-    Paint_Clear(BLACK);
+    oledC_setup();
+    oledC_clearScreen();
 }
 
 void Display_Interface(void)
 {
     Display_Component();
     
-    Paint_DrawLine(0, 65, 280, 65, YELLOW, DOT_PIXEL_1X1, LINE_STYLE_SOLID);
+    oledC_printString("Q", Q_LINE, NAME_COLUMN, OLEDC_COLOR_YELLOW);
+    oledC_printString("Z", Z_LINE, NAME_COLUMN, OLEDC_COLOR_YELLOW);
+    oledC_printString("Th", TH_LINE, NAME_COLUMN, OLEDC_COLOR_YELLOW);
+    oledC_printString("Ohm", Z_LINE, UNIT_COLUMN, OLEDC_COLOR_YELLOW);
+}
+
+void Display_Message(char *string1, char *string2)
+{
+    static char oldString1[17];
+    static char oldString2[17];
     
-    Paint_DrawString_EN(COLUMN1, ROW3, "Z  ", BLACK, YELLOW);
-    Paint_DrawString_EN(COLUMN4, ROW3, "Ohm", BLACK, YELLOW);
-    Paint_DrawString_EN(COLUMN1, ROW4, "Th ", BLACK, YELLOW);
+    // Delete old string
+    oledC_printString(oldString1, MESSAGE1_LINE, MESSAGE_COLUMN, OLEDC_COLOR_BLACK);
+    oledC_printString(oldString2, MESSAGE2_LINE, MESSAGE_COLUMN, OLEDC_COLOR_BLACK);
+    
+    // Write new string
+    oledC_printString(string1, MESSAGE1_LINE, MESSAGE_COLUMN, OLEDC_COLOR_WHITE);
+    oledC_printString(string2, MESSAGE2_LINE, MESSAGE_COLUMN, OLEDC_COLOR_WHITE);
+    
+    strcpy(oldString1, string1);
+    strcpy(oldString2, string2);
 }
 
 void Display_Result(enum COMPONENT component, float result, float Q, float z, float theta)
 {   
     if(component != displayedComponent)
     {
+        oldComponent = displayedComponent;
         displayedComponent = component;
         Display_Component();
     }
@@ -85,42 +111,39 @@ void Display_Result(enum COMPONENT component, float result, float Q, float z, fl
 }
 
 void Display_No_Component(void)
-{
-    char buffer[10] = " ----  ";
-    Paint_DrawString_EN(COLUMN2, ROW1, buffer, BLACK, WHITE);
+{   
+    Print_Float_Number(oldValue, COMPONENT_LINE, VALUE_COLUMN, OLEDC_COLOR_BLACK);
+    oledC_printString(" ----  ", COMPONENT_LINE, VALUE_COLUMN, OLEDC_COLOR_WHITE);
+    
     if(displayedComponent != RESISTOR)
     {
-        sprintf(buffer, " ----    ");
-        Paint_DrawString_EN(COLUMN2, ROW2, buffer, BLACK, WHITE);
-        sprintf(buffer, " ----  ");
+        Print_Float_Number(oldQ, Q_LINE, VALUE_COLUMN, OLEDC_COLOR_BLACK);
+        oledC_printString(" ----  ", Q_LINE, VALUE_COLUMN, OLEDC_COLOR_WHITE);
     }
-    Paint_DrawString_EN(COLUMN2, ROW3, buffer, BLACK, WHITE);
-    Paint_DrawString_EN(COLUMN2, ROW4, buffer, BLACK, WHITE);
+    
+    Print_Float_Number(oldZ, Z_LINE, VALUE_COLUMN, OLEDC_COLOR_BLACK);
+    oledC_printString(" ----  ", Z_LINE, VALUE_COLUMN, OLEDC_COLOR_WHITE);
+    
+    Print_Float_Number(oldTheta, TH_LINE, VALUE_COLUMN, OLEDC_COLOR_BLACK);
+    oledC_printString(" ----  ", TH_LINE, VALUE_COLUMN, OLEDC_COLOR_WHITE);
 }
 
 void Display_Component(void)
 {
-    if(displayedComponent == CAPACITOR)
+    oledC_printString(componentsLUT[oldComponent], COMPONENT_LINE, NAME_COLUMN, OLEDC_COLOR_BLACK);
+    oledC_printString(componentsLUT[displayedComponent], COMPONENT_LINE, NAME_COLUMN, OLEDC_COLOR_YELLOW);
+    
+    oledC_printString(unitsLUT[oldComponent], COMPONENT_LINE, UNIT_COLUMN, OLEDC_COLOR_BLACK);
+    oledC_printString(unitsLUT[displayedComponent], COMPONENT_LINE, UNIT_COLUMN, OLEDC_COLOR_YELLOW);
+    
+    oledC_printString("Q", Q_LINE, NAME_COLUMN, OLEDC_COLOR_BLACK);
+    if(displayedComponent != RESISTOR)
     {
-        Paint_DrawString_EN(COLUMN1, ROW1, "Cs ", BLACK, YELLOW);
-        Paint_DrawString_EN(COLUMN4, ROW1, "F  ", BLACK, YELLOW);
-        Paint_DrawString_EN(COLUMN1, ROW2, "Q  ", BLACK, YELLOW);
-    }
-    else if(displayedComponent == INDUCTOR)
-    {
-        Paint_DrawString_EN(COLUMN1, ROW1, "Ls ", BLACK, YELLOW);
-        Paint_DrawString_EN(COLUMN4, ROW1, "H  ", BLACK, YELLOW);
-        Paint_DrawString_EN(COLUMN1, ROW2, "Q  ", BLACK, YELLOW);
-    }
-    else {
-        Paint_DrawString_EN(COLUMN1, ROW1, "Rs ", BLACK, YELLOW);
-        Paint_DrawString_EN(COLUMN4, ROW1, "Ohm", BLACK, YELLOW);
-        Paint_DrawString_EN(COLUMN1, ROW2, "Q  ", BLACK, BLACK);
-        Paint_DrawString_EN(COLUMN2, ROW2, " ----  ", BLACK, BLACK);
+        oledC_printString("Q", Q_LINE, NAME_COLUMN, OLEDC_COLOR_YELLOW);
     }
 }
 
-void Display_Value(float result)
+void Display_Value(float value)
 {
     
     /*
@@ -130,95 +153,128 @@ void Display_Value(float result)
      * R -> Ohm
      */
     
-    uint8_t multiplicator = 0;
+    uint8_t multiplier = 0;
     
-    while(result > 1000.0)
+    while(value > 1000.0)
     {
-        multiplicator++;
-        result /= 1000.0;
+        multiplier++;
+        value /= 1000.0;
     }
     
-    Print_Float_Number(ROW1, COLUMN2, result);
+    oledC_printString(" ----  ", COMPONENT_LINE, VALUE_COLUMN, OLEDC_COLOR_BLACK);
+    Print_Float_Number(oldValue, COMPONENT_LINE, VALUE_COLUMN, OLEDC_COLOR_BLACK);
     
-    if(displayedComponent == CAPACITOR)
-    {
-        if(multiplicator == 0)
+    Print_Float_Number(value, COMPONENT_LINE, VALUE_COLUMN, OLEDC_COLOR_WHITE);
+    
+    oldValue = value;
+    
+        oledC_printString(oldMultiplier, COMPONENT_LINE, MULTIPLIER_COLUMN, OLEDC_COLOR_BLACK);
+        
+        switch(displayedComponent)
         {
-            Paint_DrawString_EN(COLUMN3, ROW1, "n", BLACK, YELLOW);
+            case CAPACITOR:
+            {
+                if(multiplier == 0)
+                {
+                    oledC_printString("n", COMPONENT_LINE, MULTIPLIER_COLUMN, OLEDC_COLOR_YELLOW);
+                    strcpy(oldMultiplier, "n");
+                }
+                
+                else
+                {
+                    oledC_printString("u", COMPONENT_LINE, MULTIPLIER_COLUMN, OLEDC_COLOR_YELLOW);
+                    strcpy(oldMultiplier, "u");
+                }
+                
+                break;
+            }
+            
+            case INDUCTOR:
+            {
+                oledC_printString("m", COMPONENT_LINE, MULTIPLIER_COLUMN, OLEDC_COLOR_YELLOW);
+                strcpy(oldMultiplier, "m");
+                
+                break;
+            }
+            
+            case RESISTOR:
+            {
+                if(multiplier == 1)
+                {
+                    oledC_printString("K", COMPONENT_LINE, MULTIPLIER_COLUMN, OLEDC_COLOR_YELLOW);
+                    strcpy(oldMultiplier, "K");
+                }
+                
+                else if(multiplier == 2)
+                {
+                    oledC_printString("M", COMPONENT_LINE, MULTIPLIER_COLUMN, OLEDC_COLOR_YELLOW);
+                    strcpy(oldMultiplier, "M");
+                }
+                
+                break;
+            }
+            
+            default:
+            {
+                break;
+            }
         }
-        else
-        {
-            Paint_DrawString_EN(COLUMN3, ROW1, "u", BLACK, YELLOW);
-        }
-    }
-    else if(displayedComponent == INDUCTOR)
-    {
-        if(multiplicator == 0)
-        {
-            Paint_DrawString_EN(COLUMN3, ROW1, "m", BLACK, YELLOW);
-        }
-        else
-        {
-            Paint_DrawString_EN(COLUMN3, ROW1, " ", BLACK, YELLOW);
-        }
-    }
-    else if(displayedComponent == RESISTOR)
-    {
-        if(multiplicator == 0)
-        {
-            Paint_DrawString_EN(COLUMN3, ROW1, " ", BLACK, YELLOW);
-        }
-        else if(multiplicator == 1)
-        {
-            Paint_DrawString_EN(COLUMN3, ROW1, "K", BLACK, YELLOW);
-        }
-        else
-        {
-            Paint_DrawString_EN(COLUMN3, ROW1, "M", BLACK, YELLOW);
-        }
-    }
 }
 
-void Display_Impedance(float result)
+void Display_Impedance(float z)
 {
     
     /*
      * Default measurement unit -> Ohm
      */
     
-    uint8_t multiplicator = 0;
+    uint8_t multiplier = 0;
     
-    while(result > 1000.0)
+    while(z > 1000.0)
     {
-        multiplicator++;
-        result /= 1000.0;
+        multiplier++;
+        z /= 1000.0;
     }
     
-    Print_Float_Number(ROW3, COLUMN2, result);
+    oledC_printString(" ----  ", Z_LINE, VALUE_COLUMN, OLEDC_COLOR_BLACK);
+    Print_Float_Number(oldZ, Z_LINE, VALUE_COLUMN, OLEDC_COLOR_BLACK);
+    Print_Float_Number(z, Z_LINE, VALUE_COLUMN, OLEDC_COLOR_WHITE);
     
-    if(multiplicator == 0)
+    oldZ = z;
+    
+    oledC_printString(oldZMultiplier, Z_LINE, MULTIPLIER_COLUMN, OLEDC_COLOR_BLACK);
+    
+    if(multiplier == 1)
     {
-        Paint_DrawString_EN(COLUMN3, ROW3, " ", BLACK, YELLOW);
+        oledC_printString("K", Z_LINE, MULTIPLIER_COLUMN, OLEDC_COLOR_YELLOW);
+        strcpy(oldZMultiplier, "K");
     }
-    else if(multiplicator == 1)
+    
+    else if(multiplier == 2)
     {
-        Paint_DrawString_EN(COLUMN3, ROW3, "K", BLACK, YELLOW);
-    }
-    else
-    {
-        Paint_DrawString_EN(COLUMN3, ROW3, "M", BLACK, YELLOW);
+        oledC_printString("M", Z_LINE, MULTIPLIER_COLUMN, OLEDC_COLOR_YELLOW);
+        strcpy(oldZMultiplier, "M");
     }
 }
 
-void Display_Q(float result)
+void Display_Q(float q)
 {
+    oledC_printString(" ----  ", Q_LINE, VALUE_COLUMN, OLEDC_COLOR_BLACK);
+    
     if(displayedComponent != RESISTOR)
     {
-        Print_Float_Number(ROW2, COLUMN2, result);
+        Print_Float_Number(oldQ, Q_LINE, VALUE_COLUMN, OLEDC_COLOR_BLACK);
+        Print_Float_Number(q, Q_LINE, VALUE_COLUMN, OLEDC_COLOR_WHITE);
+    
+        oldQ = q;
     }
 }
 
-void Display_Theta(float result) 
+void Display_Theta(float theta) 
 {
-    Print_Float_Number(ROW4, COLUMN2, result);
+    oledC_printString(" ----  ", TH_LINE, VALUE_COLUMN, OLEDC_COLOR_BLACK);
+    Print_Float_Number(oldTheta, TH_LINE, VALUE_COLUMN, OLEDC_COLOR_BLACK);
+    Print_Float_Number(theta, TH_LINE, VALUE_COLUMN, OLEDC_COLOR_WHITE);
+    
+    oldTheta = theta;
 }

@@ -54,7 +54,7 @@ void (*DMA1_ORI_InterruptHandler)(void);
  */
 void DMA1_DefaultInterruptHandler(void);
 
-uint8_t adcSamplesArray[512];
+uint8_t adcSamplesArray1[512];
 
 /**
   Section: DMA1 APIs
@@ -67,8 +67,8 @@ void DMA1_Initialize(void)
     DMASELECT = 0x0;
     //Source Address : ADRESL_CX1
     DMAnSSA = ADRESL_CX1;
-    //Destination Address : (uint16_t) &adcSamplesArray
-    DMAnDSA = (uint16_t) &adcSamplesArray;
+    //Destination Address : (uint16_t) &adcSamplesArray1
+    DMAnDSA = (uint16_t) &adcSamplesArray1;
     //SSTP not cleared; SMODE incremented; SMR SFR; DSTP cleared; DMODE incremented; 
     DMAnCON1 = 0x62;
     //Source Message Size : 2

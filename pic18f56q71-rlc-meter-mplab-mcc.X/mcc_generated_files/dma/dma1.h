@@ -66,10 +66,10 @@
 
 /**
  * @ingroup dma1
- * @var uint8_t adcSamplesArray
+ * @var uint8_t adcSamplesArray1
  * @brief Destination address.
  */
-extern uint8_t adcSamplesArray[512];
+extern uint8_t adcSamplesArray1[512];
 
 /**
  * @ingroup dma1

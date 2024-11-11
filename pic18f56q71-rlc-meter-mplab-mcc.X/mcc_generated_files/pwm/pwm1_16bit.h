@@ -55,7 +55,7 @@ void PWM1_16BIT_Initialize(void);
  * @param None.
  * @return None.
  */
-void PWM1_16BIT_Enable();
+void PWM1_16BIT_Enable(void);
 
 /**
  * @ingroup pwm1_16bit
@@ -64,7 +64,7 @@ void PWM1_16BIT_Enable();
  * @param None.
  * @return None.
  */
-void PWM1_16BIT_Disable();
+void PWM1_16BIT_Disable(void);
 
 /**
  * @ingroup pwm1_16bit

@@ -7,7 +7,7 @@
  * 
  * @brief This file contains the API prototypes for the CLC3 driver.
  *
- * @version CLC3 Driver Version 1.1.0
+ * @version CLC3 Driver Version 1.2.0
 */
 /*
 © [2024] Microchip Technology Inc. and its subsidiaries.
@@ -37,17 +37,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define CLC3_Initialize  CLC3_Initialize
-#define CLC3_Enable CLC3_Enable
-#define CLC3_Disable CLC3_Disable
-#define CLC3_ISR CLC3_ISR
-#define CLC3_OutputStatusGet CLC3_OutputStatusGet
-#define CLC3_CLCI_SetInterruptHandler CLC3_CLCI_SetInterruptHandler
 
 
 /**
  * @ingroup clc3
- * @brief  Initializes the CLC3. This routine configures the CLC3 specific control registers.
+ * @brief  Initializes the CLC3 module. This routine configures the CLC3 specific control registers.
  * @param None.
  * @return None.
  */
@@ -69,15 +63,64 @@ void CLC3_Enable(void);
  */
 void CLC3_Disable(void);
 
+/**
+ * @ingroup clc3
+ * @brief Enabes Rising Edge Detection  on CLC3 output for the CLC3 module.     
+ * @param None.
+ * @return None.
+ */
+void CLC3_RisingEdgeDetectionEnable(void);
 
 /**
  * @ingroup clc3
- * @brief Returns the output pin status of the CLC module.
+ * @brief Disables Rising Edge Detection  on CLC3 output for the CLC3 module.     
+ * @param None.
+ * @return None.
+ */
+void CLC3_RisingEdgeDetectionDisable(void);
+
+/**
+ * @ingroup clc3
+ * @brief Enables Falling Edge Detection  on CLC3 output for the CLC3 module.     
+ * @param None.
+ * @return None.
+ */
+void CLC3_FallingEdgeDetectionEnable(void);
+
+/**
+ * @ingroup clc3
+ * @brief Disables Falling Edge Detection on CLC3 output for the CLC3 module.     
+ * @param None.
+ * @return None.
+ */
+void CLC3_FallingEdgeDetectionDisable(void);
+
+
+/**
+ * @ingroup clc3
+ * @brief Returns the output pin status of the CLC3 module.
  * @param  None.
- * @retval True - Output is 1.
- * @retval False - Output is 0.
+ * @retval True - Output is 1
+ * @retval False - Output is 0
  */
 bool CLC3_OutputStatusGet(void); 
+
+/**
+ * @ingroup clc3
+ * @brief Setter function for the CLC3 callback.
+ * @param CallbackHandler - Pointer to the custom callback
+ * @return None.
+ */
+ void CLC3_CallbackRegister(void (* CallbackHandler)(void));
+
+/**
+ * @ingroup clc3
+ * @brief Performs tasks to be executed on rising edge or falling edge event in Polling mode.
+ * @param None.
+ * @return None.
+ */
+void CLC3_Tasks(void);
+
 
 #endif  // CLC3_H
 /**

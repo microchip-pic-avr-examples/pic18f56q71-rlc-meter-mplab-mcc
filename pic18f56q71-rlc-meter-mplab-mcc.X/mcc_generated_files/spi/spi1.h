@@ -7,7 +7,7 @@
  *
  * @brief This header file provides API prototypes for the SPI1 driver.
  *
- * @version SPI1 Driver Version v3.1.0.
+ * @version SPI1 Driver Version v3.1.1.
  *
 */
 
@@ -225,4 +225,5 @@ bool SPI1_IsRxReady(void);
  * @retval False SPI1 module is not ready to write data
  */
 bool SPI1_IsTxReady(void);
+
 #endif //SPI1_H

@@ -7,7 +7,7 @@
  * 
  * @brief This file contains the API implementations for the CLC3 driver.
  *
- * @version CLC3 Driver Version 1.1.0
+ * @version CLC3 Driver Version 1.2.0
 */
 /*
 © [2024] Microchip Technology Inc. and its subsidiaries.
@@ -34,6 +34,9 @@
 #include <xc.h>
 #include "../clc3.h"
 
+
+static void (*CLC3_Callback)(void);
+static void CLC3_DefaultCallback(void);
 
 void CLC3_Initialize(void) 
 {
@@ -63,16 +66,70 @@ void CLC3_Initialize(void)
     // LCMODE AND-OR; LCINTN disabled; LCINTP enabled; LCEN enabled; 
     CLCnCON = 0x90;
 
+    //Set default callback for CLC3 interrupt Overflow.
+    CLC3_CallbackRegister(CLC3_DefaultCallback);
+
+    // Clear the CLC interrupt flag
+    PIR7bits.CLC3IF = 0;
 }
 
 void CLC3_Enable(void) 
 {
+    CLCSELECTbits.SLCT = 2;
     CLCnCONbits.EN = 1;
 }
 
 void CLC3_Disable(void) 
 {
+    CLCSELECTbits.SLCT = 2;
     CLCnCONbits.EN = 0;
+}
+
+void CLC3_RisingEdgeDetectionEnable(void) 
+{
+    CLCSELECTbits.SLCT = 2;
+    CLCnCONbits.INTP = 1;
+}
+
+void CLC3_RisingEdgeDetectionDisable(void) 
+{
+    CLCSELECTbits.SLCT = 2;
+    CLCnCONbits.INTP = 0;
+}
+
+void CLC3_FallingEdgeDetectionEnable(void) 
+{
+    CLCSELECTbits.SLCT = 2;
+    CLCnCONbits.INTN = 1;
+}
+
+void CLC3_FallingEdgeDetectionDisable(void) 
+{
+    CLCSELECTbits.SLCT = 2;
+    CLCnCONbits.INTN = 0;
+}
+
+void CLC3_CallbackRegister(void (* CallbackHandler)(void))
+{
+    CLC3_Callback = CallbackHandler;
+}
+
+static void CLC3_DefaultCallback(void)
+{
+    //Add your interrupt code here or
+    //Use CLC3_CallbackRegister function to use Custom ISR
+}
+
+void CLC3_Tasks(void)
+{
+    if(PIR7bits.CLC3IF == 1)
+    {
+        if(CLC3_Callback != NULL)
+        {
+            CLC3_Callback();
+        }
+        PIR7bits.CLC3IF = 0;
+    }
 }
 
 

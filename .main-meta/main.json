@@ -4,10 +4,10 @@
     "content": {
         "metaDataVersion": "1.3.0",
         "name": "com.microchip.mcu8.mplabx.project.pic18f56q71-rlc-meter-mplab-mcc",
-        "version": "1.0.0",
+        "version": "2.0.0",
         "displayName": "RLC Meter Using the PIC18F56Q71 Microcontroller with MCC Melody",
         "projectName": "pic18f56q71-rlc-meter-mplab-mcc",
-        "shortDescription": "This repository contains a MPLAB X project, a LCR meter implementation using the internal resources of PIC18F56Q71 microcontroller.",
+        "shortDescription": "This repository contains an MPLAB® X project, a Resistance, Inductance, Capacitance (RLC) meter implementation using the internal resources of PIC18F56Q71 microcontroller.",
         "ide": {
             "name": "MPLAB X",
             "semverRange": ">=6.20.0"
@@ -15,7 +15,7 @@
         "compiler": [
             {
                 "name": "XC8",
-                "semverRange": "^2.46.0"
+                "semverRange": "^2.50.0"
             }
         ],
         "dfp": {
@@ -24,7 +24,7 @@
         },
         "configurator": {
             "name": "MCC",
-            "semverRange": ">=5.7.0"
+            "semverRange": ">=5.7.1"
         },
         "device": {
             "metaDataVersion": "1.0.0",
@@ -38,19 +38,18 @@
         },
         "author": "Gabriel Urs",
         "peripherals": [
-            "OPA",
-            "OPAMP",
             "ADC",
-            "DAC",
             "DMA",
             "PWM",
+            "TMR",
             "CLC"
         ],
         "keywords": [
             "Current Measurement",
             "Waveform Generator",
+            "Oversampling",
             "MCC Melody",
-            "Display"
+            "OLED"
         ],
         "additionalData": {
             "longDescription": {

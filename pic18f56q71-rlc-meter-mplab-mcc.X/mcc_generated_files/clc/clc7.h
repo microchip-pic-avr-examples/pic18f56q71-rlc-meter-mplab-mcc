@@ -7,7 +7,7 @@
  * 
  * @brief This file contains the API prototypes for the CLC7 driver.
  *
- * @version CLC7 Driver Version 1.1.0
+ * @version CLC7 Driver Version 1.2.0
 */
 /*
 © [2024] Microchip Technology Inc. and its subsidiaries.
@@ -37,17 +37,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define CLC7_Initialize  CLC7_Initialize
-#define CLC7_Enable CLC7_Enable
-#define CLC7_Disable CLC7_Disable
-#define CLC7_ISR CLC7_ISR
-#define CLC7_OutputStatusGet CLC7_OutputStatusGet
-#define CLC7_CLCI_SetInterruptHandler CLC7_CLCI_SetInterruptHandler
 
 
 /**
  * @ingroup clc7
- * @brief  Initializes the CLC7. This routine configures the CLC7 specific control registers.
+ * @brief  Initializes the CLC7 module. This routine configures the CLC7 specific control registers.
  * @param None.
  * @return None.
  */
@@ -69,15 +63,64 @@ void CLC7_Enable(void);
  */
 void CLC7_Disable(void);
 
+/**
+ * @ingroup clc7
+ * @brief Enabes Rising Edge Detection  on CLC7 output for the CLC7 module.     
+ * @param None.
+ * @return None.
+ */
+void CLC7_RisingEdgeDetectionEnable(void);
 
 /**
  * @ingroup clc7
- * @brief Returns the output pin status of the CLC module.
+ * @brief Disables Rising Edge Detection  on CLC7 output for the CLC7 module.     
+ * @param None.
+ * @return None.
+ */
+void CLC7_RisingEdgeDetectionDisable(void);
+
+/**
+ * @ingroup clc7
+ * @brief Enables Falling Edge Detection  on CLC7 output for the CLC7 module.     
+ * @param None.
+ * @return None.
+ */
+void CLC7_FallingEdgeDetectionEnable(void);
+
+/**
+ * @ingroup clc7
+ * @brief Disables Falling Edge Detection on CLC7 output for the CLC7 module.     
+ * @param None.
+ * @return None.
+ */
+void CLC7_FallingEdgeDetectionDisable(void);
+
+
+/**
+ * @ingroup clc7
+ * @brief Returns the output pin status of the CLC7 module.
  * @param  None.
- * @retval True - Output is 1.
- * @retval False - Output is 0.
+ * @retval True - Output is 1
+ * @retval False - Output is 0
  */
 bool CLC7_OutputStatusGet(void); 
+
+/**
+ * @ingroup clc7
+ * @brief Setter function for the CLC7 callback.
+ * @param CallbackHandler - Pointer to the custom callback
+ * @return None.
+ */
+ void CLC7_CallbackRegister(void (* CallbackHandler)(void));
+
+/**
+ * @ingroup clc7
+ * @brief Performs tasks to be executed on rising edge or falling edge event in Polling mode.
+ * @param None.
+ * @return None.
+ */
+void CLC7_Tasks(void);
+
 
 #endif  // CLC7_H
 /**

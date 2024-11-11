@@ -7,7 +7,7 @@
  * 
  * @brief This file contains the API prototypes for the CLC6 driver.
  *
- * @version CLC6 Driver Version 1.1.0
+ * @version CLC6 Driver Version 1.2.0
 */
 /*
 © [2024] Microchip Technology Inc. and its subsidiaries.
@@ -37,17 +37,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define CLC6_Initialize  CLC6_Initialize
-#define CLC6_Enable CLC6_Enable
-#define CLC6_Disable CLC6_Disable
-#define CLC6_ISR CLC6_ISR
-#define CLC6_OutputStatusGet CLC6_OutputStatusGet
-#define CLC6_CLCI_SetInterruptHandler CLC6_CLCI_SetInterruptHandler
 
 
 /**
  * @ingroup clc6
- * @brief  Initializes the CLC6. This routine configures the CLC6 specific control registers.
+ * @brief  Initializes the CLC6 module. This routine configures the CLC6 specific control registers.
  * @param None.
  * @return None.
  */
@@ -69,15 +63,64 @@ void CLC6_Enable(void);
  */
 void CLC6_Disable(void);
 
+/**
+ * @ingroup clc6
+ * @brief Enabes Rising Edge Detection  on CLC6 output for the CLC6 module.     
+ * @param None.
+ * @return None.
+ */
+void CLC6_RisingEdgeDetectionEnable(void);
 
 /**
  * @ingroup clc6
- * @brief Returns the output pin status of the CLC module.
+ * @brief Disables Rising Edge Detection  on CLC6 output for the CLC6 module.     
+ * @param None.
+ * @return None.
+ */
+void CLC6_RisingEdgeDetectionDisable(void);
+
+/**
+ * @ingroup clc6
+ * @brief Enables Falling Edge Detection  on CLC6 output for the CLC6 module.     
+ * @param None.
+ * @return None.
+ */
+void CLC6_FallingEdgeDetectionEnable(void);
+
+/**
+ * @ingroup clc6
+ * @brief Disables Falling Edge Detection on CLC6 output for the CLC6 module.     
+ * @param None.
+ * @return None.
+ */
+void CLC6_FallingEdgeDetectionDisable(void);
+
+
+/**
+ * @ingroup clc6
+ * @brief Returns the output pin status of the CLC6 module.
  * @param  None.
- * @retval True - Output is 1.
- * @retval False - Output is 0.
+ * @retval True - Output is 1
+ * @retval False - Output is 0
  */
 bool CLC6_OutputStatusGet(void); 
+
+/**
+ * @ingroup clc6
+ * @brief Setter function for the CLC6 callback.
+ * @param CallbackHandler - Pointer to the custom callback
+ * @return None.
+ */
+ void CLC6_CallbackRegister(void (* CallbackHandler)(void));
+
+/**
+ * @ingroup clc6
+ * @brief Performs tasks to be executed on rising edge or falling edge event in Polling mode.
+ * @param None.
+ * @return None.
+ */
+void CLC6_Tasks(void);
+
 
 #endif  // CLC6_H
 /**

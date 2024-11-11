@@ -8,7 +8,7 @@
  * @brief This is generated driver implementation for pins. 
  *        This file provides implementations for pin APIs for all pins selected in the GUI.
  *
- * @version Driver Version 3.1.0
+ * @version Driver Version 3.1.1
 */
 
 /*
@@ -34,49 +34,19 @@
 
 #include "../pins.h"
 
+void (*BUTTON_InterruptHandler)(void);
 
 void PIN_MANAGER_Initialize(void)
 {
    /**
     LATx registers
     */
-    LATA = 0x0;
+    LATA = 0x20;
     LATB = 0x0;
     LATC = 0x0;
     LATD = 0x0;
     LATE = 0x0;
     LATF = 0x0;
-
-    /**
-    TRISx registers
-    */
-    TRISA = 0xFB;
-    TRISB = 0xFF;
-    TRISC = 0x79;
-    TRISD = 0x16;
-    TRISE = 0xB;
-    TRISF = 0x2;
-
-    /**
-    ANSELx registers
-    */
-    ANSELA = 0xFF;
-    ANSELB = 0xFF;
-    ANSELC = 0x19;
-    ANSELD = 0xDC;
-    ANSELE = 0x3;
-    ANSELF = 0x33;
-
-    /**
-    WPUx registers
-    */
-    WPUA = 0x0;
-    WPUB = 0x0;
-    WPUC = 0x0;
-    WPUD = 0x0;
-    WPUE = 0x0;
-    WPUF = 0x0;
-
     /**
     ODx registers
     */
@@ -86,6 +56,37 @@ void PIN_MANAGER_Initialize(void)
     ODCOND = 0x0;
     ODCONE = 0x0;
     ODCONF = 0x0;
+
+    /**
+    TRISx registers
+    */
+    TRISA = 0x8F;
+    TRISB = 0xEA;
+    TRISC = 0x7B;
+    TRISD = 0xBF;
+    TRISE = 0xF;
+    TRISF = 0x4B;
+
+    /**
+    ANSELx registers
+    */
+    ANSELA = 0x8E;
+    ANSELB = 0xCB;
+    ANSELC = 0x1B;
+    ANSELD = 0xFF;
+    ANSELE = 0x7;
+    ANSELF = 0x4F;
+
+    /**
+    WPUx registers
+    */
+    WPUA = 0x1;
+    WPUB = 0x0;
+    WPUC = 0x0;
+    WPUD = 0x0;
+    WPUE = 0x0;
+    WPUF = 0x0;
+
 
     /**
     SLRCONx registers
@@ -121,23 +122,20 @@ void PIN_MANAGER_Initialize(void)
     CLCIN2PPS = 0x3A; //RW2->CLC7:CLCIN2;
     CLCIN1PPS = 0x39; //RW1->CLC6:CLCIN1;
     SPI1SDIPPS = 0x15; //RC5->SPI1:SDI1;
-    U2RXPPS = 0x19; //RD1->UART2:RX2;
-    RF0PPS = 0x01;  //RF0->CLC1:CLC1;
-    RD7PPS = 0x08;  //RD7->CLC8:CLC8;
-    RD6PPS = 0x07;  //RD6->CLC7:CLC7;
-    RF5PPS = 0x06;  //RF5->CLC6:CLC6;
-    RD3PPS = 0x03;  //RD3->CLC3:CLC3;
+    U2RXPPS = 0xD; //RB5->UART2:RX2;
+    RD6PPS = 0x03;  //RD6->CLC3:CLC3;
     RC2PPS = 0x1E;  //RC2->SPI1:SDO1;
-    RF4PPS = 0x0F;  //RF4->PWM1_16BIT:PWM11;
-    RD0PPS = 0x18;  //RD0->UART2:TX2;
+    RB0PPS = 0x11;  //RB0->PWM2_16BIT:PWM21;
+    RF2PPS = 0x0F;  //RF2->PWM1_16BIT:PWM11;
+    RB4PPS = 0x18;  //RB4->UART2:TX2;
     SPI1SCKPPS = 0x16;  //RC6->SPI1:SCK1;
     RC6PPS = 0x1D;  //RC6->SPI1:SCK1;
 
    /**
     IOCx registers 
     */
-    IOCAP = 0x0;
-    IOCAN = 0x0;
+    IOCAP = 0x1;
+    IOCAN = 0x1;
     IOCAF = 0x0;
     IOCWP = 0x0;
     IOCWN = 0x0;
@@ -152,11 +150,49 @@ void PIN_MANAGER_Initialize(void)
     IOCEN = 0x0;
     IOCEF = 0x0;
 
+    BUTTON_SetInterruptHandler(BUTTON_DefaultInterruptHandler);
 
+    // Enable PIE0bits.IOCIE interrupt 
+    PIE0bits.IOCIE = 1; 
 }
   
 void PIN_MANAGER_IOC(void)
 {
+    // interrupt on change for pin BUTTON
+    if(IOCAFbits.IOCAF0 == 1)
+    {
+        BUTTON_ISR();  
+    }
+}
+   
+/**
+   BUTTON Interrupt Service Routine
+*/
+void BUTTON_ISR(void) {
+
+    // Add custom BUTTON code
+
+    // Call the interrupt handler for the callback registered at runtime
+    if(BUTTON_InterruptHandler)
+    {
+        BUTTON_InterruptHandler();
+    }
+    IOCAFbits.IOCAF0 = 0;
+}
+
+/**
+  Allows selecting an interrupt handler for BUTTON at application runtime
+*/
+void BUTTON_SetInterruptHandler(void (* InterruptHandler)(void)){
+    BUTTON_InterruptHandler = InterruptHandler;
+}
+
+/**
+  Default interrupt handler for BUTTON
+*/
+void BUTTON_DefaultInterruptHandler(void){
+    // add your BUTTON interrupt custom code
+    // or set custom function using BUTTON_SetInterruptHandler()
 }
 /**
  End of File

@@ -38,6 +38,20 @@
 #include <xc.h>
 #include "../dma2.h"
 
+void (*DMA2_SCNTI_InterruptHandler)(void);
+
+void (*DMA2_AI_InterruptHandler)(void);
+
+void (*DMA2_ORI_InterruptHandler)(void);
+
+/**
+ * @ingroup dma2
+ * @brief Default interrupt handler for all interrupt events.
+ * @param None.
+ * @return None.
+ */
+void DMA2_DefaultInterruptHandler(void);
+
 /**
   Section: DMA2 APIs
 */
@@ -47,16 +61,16 @@ void DMA2_Initialize(void)
     
     //DMA Instance Selection : 0x1
     DMASELECT = 0x1;
-    //Source Address : 0x0011F3
-    DMAnSSA = 0x0011F3;
-    //Destination Address : (uint16_t) &DAC1DATH
-    DMAnDSA = (uint16_t) &DAC1DATH;
-    //SSTP not cleared; SMODE decremented; SMR Program Flash; DSTP not cleared; DMODE decremented; 
-    DMAnCON1 = 0x8C;
-    //Source Message Size : 500
-    DMAnSSZ = 500;
-    //Destination Message Size : 2
-    DMAnDSZ = 2;
+    //Source Address : 0x001000
+    DMAnSSA = 0x001000;
+    //Destination Address : (uint16_t) &PWM2S1P1L
+    DMAnDSA = (uint16_t) &PWM2S1P1L;
+    //SSTP not cleared; SMODE incremented; SMR Program Flash; DSTP not cleared; DMODE unchanged; 
+    DMAnCON1 = 0xA;
+    //Source Message Size : 250
+    DMAnSSZ = 250;
+    //Destination Message Size : 1
+    DMAnDSZ = 1;
     //Start Trigger : SIRQ CLC1; 
     DMAnSIRQ = 0x5;
     //Abort Trigger : AIRQ Software Interrupt; 
@@ -72,9 +86,12 @@ void DMA2_Initialize(void)
     PIR6bits.DMA2ORIF =0; 
     
     PIE6bits.DMA2DCNTIE = 0;
-    PIE6bits.DMA2SCNTIE = 0;
-    PIE6bits.DMA2AIE = 0;
-    PIE6bits.DMA2ORIE = 0;
+    PIE6bits.DMA2SCNTIE = 1; 
+	DMA2_SCNTIInterruptHandlerSet(DMA2_DefaultInterruptHandler);
+    PIE6bits.DMA2AIE = 1; 
+	DMA2_AIInterruptHandlerSet(DMA2_DefaultInterruptHandler);
+    PIE6bits.DMA2ORIE =1; 
+	DMA2_ORIInterruptHandlerSet(DMA2_DefaultInterruptHandler);
 	
     //AIRQEN disabled; DGO not in progress; SIRQEN enabled; EN enabled; 
     DMAnCON0 = 0xC0;
@@ -216,6 +233,52 @@ void DMA2_DMAPrioritySet(uint8_t priority)
     INTCON0bits.GIE = GIESaveState;
 }
 
+void DMA2_DMASCNTI_ISR(void)
+{
+    // Clear the source count interrupt flag
+    PIR6bits.DMA2SCNTIF = 0;
+
+    if (DMA2_SCNTI_InterruptHandler)
+            DMA2_SCNTI_InterruptHandler();
+}
+
+void DMA2_SCNTIInterruptHandlerSet(void (* InterruptHandler)(void))
+{
+	 DMA2_SCNTI_InterruptHandler = InterruptHandler;
+}
+
+void DMA2_DMAAI_ISR(void)
+{
+    // Clear the source count interrupt flag
+    PIR6bits.DMA2AIF = 0;
+
+    if (DMA2_AI_InterruptHandler)
+            DMA2_AI_InterruptHandler();
+}
+
+void DMA2_AIInterruptHandlerSet(void (* InterruptHandler)(void))
+{
+	 DMA2_AI_InterruptHandler = InterruptHandler;
+}
+
+void DMA2_DMAORI_ISR(void)
+{
+    // Clear the source count interrupt flag
+    PIR6bits.DMA2ORIF = 0;
+
+    if (DMA2_ORI_InterruptHandler)
+            DMA2_ORI_InterruptHandler();
+}
+
+void DMA2_ORIInterruptHandlerSet(void (* InterruptHandler)(void))
+{
+	 DMA2_ORI_InterruptHandler = InterruptHandler;
+}
+
+void DMA2_DefaultInterruptHandler(void){
+    // add your DMA2 interrupt custom code
+    // or set custom function using DMA2_SCNTIInterruptHandlerSet() /DMA2_DCNTIInterruptHandlerSet() /DMA2_AIInterruptHandlerSet() /DMA2_ORIInterruptHandlerSet()
+}
 /**
  End of File
 */

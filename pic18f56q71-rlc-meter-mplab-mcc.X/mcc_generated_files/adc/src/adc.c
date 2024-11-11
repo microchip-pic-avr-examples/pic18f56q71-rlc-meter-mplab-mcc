@@ -3,12 +3,15 @@
  * 
  * @file adc.c
  * 
- * @ingroup adc
+ * @ingroup  adc
  * 
- * @brief This is the generated driver implementation file for the ADC driver.
+ * @brief This file contains the API implementations for the ADC driver.
  *
- * @version ADC Driver Version 1.0.2
+ * @version ADC Driver Version 2.0.0
+ * 
+ * @version ADC Package Version 2.0.0
 */
+
 /*
 © [2024] Microchip Technology Inc. and its subsidiaries.
 
@@ -30,360 +33,599 @@
     THIS SOFTWARE.
 */
 
-/**
-  Section: Included Files
-*/
-
 #include <xc.h>
 #include "../adc.h"
+#include "../adc_types.h"
+
+
+static bool adc_busy_status;
+static void (*ADC_ConversionDoneCallback)(void);
+static void (*ADC_Context1ThresholdCallback)(void);
 
 
 void ADC_Initialize(void)
 {
-    //GO_nDONE undefined; IC differential mode; ADFM right justified, two's compliment; ADCS FOSC; CSEN disabled; ADCONT disabled; ADON disabled; 
-    ADCON0 = 0x6;
+    ADCON0bits.ADON = ADC_BIT_CLEAR;    
+    ADACT = (21 << _ADACT_ADACT_POSITION);	/* ADACT CLC3(21) */
+    ADCLK = (31 << _ADCLK_ADCS_POSITION);	/* ADCS FOSC/64(31) */
+    ADCGA = (0 << _ADCGA_CGA0_POSITION)	/* CGA0 disabled(0) */
+			|(0 << _ADCGA_CGA1_POSITION)	/* CGA1 disabled(0) */
+			|(0 << _ADCGA_CGA2_POSITION)	/* CGA2 disabled(0) */
+			|(0 << _ADCGA_CGA3_POSITION)	/* CGA3 disabled(0) */
+			|(0 << _ADCGA_CGA4_POSITION)	/* CGA4 disabled(0) */
+			|(0 << _ADCGA_CGA5_POSITION)	/* CGA5 disabled(0) */
+			|(0 << _ADCGA_CGA6_POSITION)	/* CGA6 disabled(0) */
+			|(0 << _ADCGA_CGA7_POSITION);	/* CGA7 disabled(0) */
+    ADCGB = (0 << _ADCGB_CGB0_POSITION)	/* CGB0 disabled(0) */
+			|(0 << _ADCGB_CGB1_POSITION)	/* CGB1 disabled(0) */
+			|(0 << _ADCGB_CGB2_POSITION)	/* CGB2 disabled(0) */
+			|(0 << _ADCGB_CGB3_POSITION)	/* CGB3 disabled(0) */
+			|(0 << _ADCGB_CGB4_POSITION)	/* CGB4 disabled(0) */
+			|(0 << _ADCGB_CGB5_POSITION)	/* CGB5 disabled(0) */
+			|(0 << _ADCGB_CGB6_POSITION)	/* CGB6 disabled(0) */
+			|(0 << _ADCGB_CGB7_POSITION);	/* CGB7 disabled(0) */
+    ADCGC = (0 << _ADCGC_CGC0_POSITION)	/* CGC0 disabled(0) */
+			|(0 << _ADCGC_CGC1_POSITION)	/* CGC1 disabled(0) */
+			|(0 << _ADCGC_CGC2_POSITION)	/* CGC2 disabled(0) */
+			|(0 << _ADCGC_CGC3_POSITION)	/* CGC3 disabled(0) */
+			|(0 << _ADCGC_CGC4_POSITION)	/* CGC4 disabled(0) */
+			|(0 << _ADCGC_CGC5_POSITION)	/* CGC5 disabled(0) */
+			|(0 << _ADCGC_CGC6_POSITION)	/* CGC6 disabled(0) */
+			|(0 << _ADCGC_CGC7_POSITION);	/* CGC7 disabled(0) */
+    ADCGD = (0 << _ADCGD_CGD0_POSITION)	/* CGD0 disabled(0) */
+			|(0 << _ADCGD_CGD1_POSITION)	/* CGD1 disabled(0) */
+			|(0 << _ADCGD_CGD2_POSITION)	/* CGD2 disabled(0) */
+			|(0 << _ADCGD_CGD3_POSITION)	/* CGD3 disabled(0) */
+			|(0 << _ADCGD_CGD4_POSITION)	/* CGD4 disabled(0) */
+			|(0 << _ADCGD_CGD5_POSITION)	/* CGD5 disabled(0) */
+			|(0 << _ADCGD_CGD6_POSITION)	/* CGD6 disabled(0) */
+			|(0 << _ADCGD_CGD7_POSITION);	/* CGD7 disabled(0) */
+    ADCGE = (0 << _ADCGE_CGE0_POSITION)	/* CGE0 disabled(0) */
+			|(0 << _ADCGE_CGE1_POSITION)	/* CGE1 disabled(0) */
+			|(0 << _ADCGE_CGE2_POSITION);	/* CGE2 disabled(0) */
 
-    //ADACT CLC3; 
-    ADACT = 0x15;
 
-    //ADCCS FOSC/64; 
-    ADCLK = 0x1F;
 
-    //CGA0 disabled; CGA1 disabled; CGA2 disabled; CGA3 disabled; CGA4 disabled; CGA5 disabled; CGA6 disabled; CGA7 disabled; 
-    ADCGA = 0x0;
-
-    //CGB0 disabled; CGB1 enabled; CGB2 disabled; CGB3 disabled; CGB4 disabled; CGB5 disabled; CGB6 disabled; CGB7 disabled; 
-    ADCGB = 0x2;
-
-    //CGC0 disabled; CGC1 disabled; CGC2 disabled; CGC3 disabled; CGC4 disabled; CGC5 disabled; CGC6 disabled; CGC7 disabled; 
-    ADCGC = 0x0;
-
-    //CGD0 disabled; CGD1 disabled; CGD2 disabled; CGD3 disabled; CGD4 disabled; CGD5 disabled; CGD6 disabled; CGD7 disabled; 
-    ADCGD = 0x0;
-
-    //CGE0 disabled; CGE1 disabled; CGE2 disabled; 
-    ADCGE = 0x0;
 
     /****************************************
     *         Configure Context-1           *
     ****************************************/
-    //CTX 0; CTXSW user context; 
     ADCTX = 0x0;
+    ADLTHL = (0 << _ADLTHL_ADLTH_POSITION);	/* ADLTH 0x0(0) */
+    ADLTHH = (0 << _ADLTHH_ADLTH_POSITION);	/* ADLTH 0x0(0) */
+    ADUTHL = (1 << _ADUTHL_ADUTH_POSITION);	/* ADUTH 0x1(1) */
+    ADUTHH = (0 << _ADUTHH_ADUTH_POSITION);	/* ADUTH 0x0(0) */
+    ADSTPTL = (0 << _ADSTPTL_ADSTPT_POSITION);	/* ADSTPT 0x0(0) */
+    ADSTPTH = (0 << _ADSTPTH_ADSTPT_POSITION);	/* ADSTPT 0x0(0) */
+    ADACCL = (0 << _ADACCL_ADACC_POSITION);	/* ADACC 0x0(0) */
+    ADACCH = (0 << _ADACCH_ADACC_POSITION);	/* ADACC 0x0(0) */
+    ADACCU = (0 << _ADACCU_ADACC_POSITION);	/* ADACC 0x0(0) */
+    ADCNT = (0 << _ADCNT_ADCNT_POSITION);	/* ADCNT 0x0(0) */
+    ADRPT = (0 << _ADRPT_ADRPT_POSITION);	/* ADRPT 0x0(0) */
+    ADRESL = (0 << _ADRESL_ADRES_POSITION);	/* ADRES 0x0(0) */
+    ADRESH = (0 << _ADRESH_ADRES_POSITION);	/* ADRES 0x0(0) */
+    ADPCH = (1 << _ADPCH_PCH_POSITION);	/* PCH ANA1(1) */
+    ADNCH = (61 << _ADNCH_ADNCH_POSITION);	/* ADNCH DAC1(61) */
+    ADACQL = (0 << _ADACQL_ADACQ_POSITION);	/* ADACQ 0x0(0) */
+    ADACQH = (0 << _ADACQH_ADACQ_POSITION);	/* ADACQ 0x0(0) */
+    ADCAP = (0 << _ADCAP_ADCAP_POSITION);	/* ADCAP Additional uC disabled(0) */
+    ADPREL = (0 << _ADPREL_ADPRE_POSITION);	/* ADPRE 0x0(0) */
+    ADPREH = (0 << _ADPREH_ADPRE_POSITION);	/* ADPRE 0x0(0) */
+    ADCON0bits.ADCONT = ADC_BIT_CLEAR;
+    ADCON1 = (0 << _ADCON1_ADDSEN_POSITION)	/* ADDSEN disabled(0) */
+			|(1 << _ADCON1_PCSC_POSITION)	/* PCSC sampling capacitor(1) */
+			|(0 << _ADCON1_ADGPOL_POSITION)	/* ADGPOL digital_low(0) */
+			|(0 << _ADCON1_ADIPEN_POSITION)	/* ADIPEN disabled(0) */
+			|(0 << _ADCON1_ADPPOL_POSITION);	/* ADPPOL Vss(0) */
+    ADCON2 = (0 << _ADCON2_ADMD_POSITION)	/* ADMD Basic_mode(0) */
+			|(1 << _ADCON2_ADACLR_POSITION)	/* ADACLR enabled(1) */
+			|(1 << _ADCON2_ADCRS_POSITION)	/* ADCRS 0x1(1) */
+			|(0 << _ADCON2_ADPSIS_POSITION);	/* ADPSIS RES(0) */
+    ADCON3 = (7 << _ADCON3_ADTMD_POSITION)	/* ADTMD enabled(7) */
+			|(0 << _ADCON3_ADSOI_POSITION)	/* ADSOI ADGO not cleared(0) */
+			|(1 << _ADCON3_ADCALC_POSITION);	/* ADCALC Actual result vs setpoint(1) */
+    ADSTAT = (0 << _ADSTAT_ADMATH_POSITION);	/* ADMATH registers not updated(0) */
+    ADREF = (0 << _ADREF_ADNREF_POSITION)	/* ADNREF VSS(0) */
+			|(0 << _ADREF_ADPREF_POSITION);	/* ADPREF VDD(0) */
+    ADCSEL1 = (0 << _ADCSEL1_SSI_POSITION)	/* SSI scan sequence continues(0) */
+			|(0 << _ADCSEL1_CHEN_POSITION);	/* CHEN channel context is not included(0) */
 
-    //ADLTHL 0; 
-    ADLTHL = 0x0;
+    adc_busy_status = false;
+    ADC_ConversionDoneCallback = NULL;
+    ADC_Context1ThresholdCallback = NULL;
 
-    //ADLTHH 0; 
-    ADLTHH = 0x0;
+    PIR1bits.ADIF = ADC_BIT_CLEAR;
+    PIE1bits.ADIE = ADC_BIT_CLEAR;
 
-    //ADUTHL 216; 
-    ADUTHL = 0xD8;
+    PIR1bits.ADCH1IF = ADC_BIT_CLEAR;
+    PIE1bits.ADCH1IE = ADC_BIT_CLEAR;
 
-    //ADUTHH 4; 
-    ADUTHH = 0x4;
+    PIR1bits.ADCH2IF = ADC_BIT_CLEAR;
+    PIE1bits.ADCH2IE = ADC_BIT_CLEAR;
 
-    //ADSTPTL 0; 
-    ADSTPTL = 0x0;
+    PIR1bits.ADCH3IF = ADC_BIT_CLEAR;
+    PIE1bits.ADCH3IE = ADC_BIT_CLEAR;
 
-    //ADSTPTH 0; 
-    ADSTPTH = 0x0;
+    PIR1bits.ADCH4IF = ADC_BIT_CLEAR;
+    PIE1bits.ADCH4IE = ADC_BIT_CLEAR;
 
-    //ADACCL 0x0; 
-    ADACCL = 0x0;
-
-    //ADACCH 0x0; 
-    ADACCH = 0x0;
-
-    //ADACCU 0x0; 
-    ADACCU = 0x0;
-
-    //ADCNT 0x0; 
-    ADCNT = 0x0;
-
-    //ADRPT 125; 
-    ADRPT = 0x7D;
-
-    //ADRESL 0x0; 
-    ADRESL = 0x0;
-
-    //ADRESH 0x0; 
-    ADRESH = 0x0;
-
-    //ADCHS ANB1; 
-    ADPCH = 0x9;
-
-    //ADCHS ANA1; 
-    ADNCH = 0x1;
-
-    //ADACQL 1; 
-    ADACQL = 0x1;
-
-    //ADACQH 0; 
-    ADACQH = 0x0;
-
-    //ADCAP Additional uC disabled; 
-    ADCAP = 0x0;
-
-    //ADPREL 6; 
-    ADPREL = 0x6;
-
-    //ADPREH 0; 
-    ADPREH = 0x0;
-    
-    //Disable continuous operation
-    ADCON0bits.ADCONT = 0;
-
-    //ADDSEN disabled; PCSC sampling capacitor; ADGPOL digital_low; ADIPEN disabled; ADPPOL Vss; 
-    ADCON1 = 0x2;
-
-    //ADMD Basic_mode; ADACLR disabled; ADCRS 3; ADPSIS FLTR; 
-    ADCON2 = 0xB0;
-
-    //ADTMD enabled; ADSOI ADGO not cleared; ADCALC First derivative of Single measurement; 
-    ADCON3 = 0x7;
-
-    //ADMATH registers not updated; 
-    ADSTAT = 0x0;
-
-    //ADNREF VSS; ADPREF VDD; 
-    ADREF = 0x0;
-    
-    //SSI scan sequence continues; CHEN channel context is not included; 
-    ADCSEL1 = 0x0;
-
-    // Clear the ADC interrupt flag
-    PIR1bits.ADIF = 0;
-
-    //Clear ADC Context-1 Threshold Interrupt Flag
-    PIR1bits.ADCH1IF = 0;
-
-    //Clear ADC Context-2 Threshold Interrupt Flag
-    PIR1bits.ADCH2IF = 0;
-
-    //Clear ADC Context-3 Threshold Interrupt Flag
-    PIR1bits.ADCH3IF = 0;
-
-    //Clear ADC Context-4 Threshold Interrupt Flag
-    PIR1bits.ADCH4IF = 0;
-
-    //Enable ADC
-    ADCON0bits.ADON = 1;
+    ADCON0 = 0x86;
 }
 
-inline void ADC_SelectContext(adc_context_t context)
+void ADC_Deinitialize(void)
+{
+    ADCON0 = 0x2;
+    PIR1bits.ADIF = ADC_BIT_CLEAR;
+    PIE1bits.ADIE = ADC_BIT_CLEAR;
+
+    PIR1bits.ADCH1IF = ADC_BIT_CLEAR;
+    PIE1bits.ADCH1IE = ADC_BIT_CLEAR;
+
+    PIR1bits.ADCH2IF = ADC_BIT_CLEAR;
+    PIE1bits.ADCH2IE = ADC_BIT_CLEAR;
+
+    PIR1bits.ADCH3IF = ADC_BIT_CLEAR;
+    PIE1bits.ADCH3IE = ADC_BIT_CLEAR;
+
+    PIR1bits.ADCH4IF = ADC_BIT_CLEAR;
+    PIE1bits.ADCH4IE = ADC_BIT_CLEAR;
+
+    ADACT = 0x0;
+
+
+    ADCLK = 0x0;
+
+    ADCGA = 0x0;
+
+    ADCGB = 0x0;
+
+    ADCGC = 0x0;
+
+    ADCGD = 0x0;
+
+    ADCGE = 0x0;
+
+
+
+    /****************************************
+    *         Configure Context-1           *
+    ****************************************/
+    ADCTX = 0x0;
+
+    ADLTHL = 0x0;
+
+    ADLTHH = 0x0;
+
+    ADUTHL = 0x0;
+
+    ADUTHH = 0x0;
+
+    ADSTPTL = 0x0;
+
+    ADSTPTH = 0x0;
+
+    ADACCL = 0x0;
+
+    ADACCH = 0x0;
+
+    ADACCU = 0x0;
+
+    ADCNT = 0x0;
+
+    ADRPT = 0x0;
+
+    ADRESL = 0x0;
+
+    ADRESH = 0x0;
+
+    ADPCH = 0x0;
+
+    ADNCH = 0x0;
+
+    ADACQL = 0x0;
+
+    ADACQH = 0x0;
+
+    ADCAP = 0x0;
+
+    ADPREL = 0x0;
+
+    ADPREH = 0x0;
+    
+    ADCON0bits.ADCONT = ADC_BIT_CLEAR;
+
+    ADCON1 = 0x0;
+
+    ADCON2 = 0x0;
+
+    ADCON3 = 0x0;
+
+    ADSTAT = 0x0;
+
+    ADREF = 0x0;
+    
+    ADCSEL1 = 0x0;
+}
+
+void ADC_Enable(void)
+{
+    ADCON0bits.ADON = ADC_BIT_SET;
+}
+
+void ADC_Disable(void)
+{
+    ADCON0bits.ADON = ADC_BIT_CLEAR;
+}
+
+void ADC_ContextSelect(adc_context_t context)
 {
     ADCTX = context;
 }
 
-void ADC_EnableChannelScan(adc_context_t context)
+adc_context_t ADC_CurrentContextGet(void)
 {
-    switch (context)
-    {
-    case context_1:
-        ADCSEL1bits.CHEN = 1;
-        break;
-    default:
-        break;
-    }
+    return (adc_context_t)ADCTX;
 }
 
-void ADC_DisableChannelScan(adc_context_t context)
-{
-    switch (context)
-    {
-    case context_1:
-        ADCSEL1bits.CHEN = 0;
-        break;
-    default:
-        break;
-    }
-}
-
-inline void ADC_EnableChannelSequencer(void)
-{
-    ADCON0bits.CSEN = 1;
-}
-
-inline void ADC_DisableChannelSequencer(void)
-{
-    ADCON0bits.CSEN  = 0;
-}
-
-inline void ADC_SetPositiveChannel(adc_posChannel_t posChannel)
+void ADC_DifferentialChannelSelect(adc_posChannel_t posChannel, adc_negChannel_t negChannel)
 {
     ADPCH = posChannel;
-}
-
-inline void ADC_SetNegativeChannel(adc_negChannel_t negChannel)
-{
     ADNCH = negChannel;
 }
 
-void ADC_StartConversionOnChannel(adc_posChannel_t posChannel,adc_negChannel_t negChannel)
+void ADC_ConversionStart(void)
 {
-    // select the A/D channels
-    ADC_SetPositiveChannel(posChannel);  
-    ADC_SetNegativeChannel(negChannel);  
-    
-    // Start the conversion
-    ADC_StartConversion();
+    ADCON0bits.ADGO = ADC_BIT_SET;
 }
 
-inline void ADC_DischargeSampleCapacitor(void)
+bool ADC_IsConversionDone(void)
 {
-    //Set ADC channel to AVss
-    ADPCH = 0x3b;
+    return ((bool)(!ADCON0bits.ADGO));
 }
 
-inline void ADC_StartConversion(void)
+void ADC_ConversionStop(void)
 {
-    ADCON0bits.ADGO = 1;
+    ADCON0bits.ADGO = ADC_BIT_CLEAR;
 }
 
-inline void ADC_StopConversion(void)
+adc_result_t ADC_ConversionResultGet(void)
 {
-    ADCON0bits.ADGO = 0;
-}
-
-inline bool ADC_IsConversionDone(void)
-{
-    return ((unsigned char)(!ADCON0bits.ADGO));
-}
-
-inline adc_result_t ADC_GetConversionResult(void)
-{
-    //Return result of A/D conversion
     return ((adc_result_t) ((ADRESH << 8) | ADRESL));
 }
 
-adc_result_t ADC_GetSingleConversion(adc_posChannel_t posChannel,adc_negChannel_t negChannel)
+void ADC_ComputationModeSet(adc_computation_mode_t computationMode)
 {
-    adc_result_t result;
+    ADCON2bits.ADMD |= computationMode;
+}
 
-    // select the A/D channels
-    ADC_SetPositiveChannel(posChannel);  
-    ADC_SetNegativeChannel(negChannel);
-    
-    // Disable the continuous mode.
-    ADC_DisableContinuousConversion();
+void ADC_ThresholdModeSet(adc_threshold_mode_t thresholdMode)
+{
+    ADCON3bits.ADTMD |= thresholdMode;
+}
 
-    // Start the conversion
-    ADC_StartConversion();
+void ADC_SampleRepeatCountSet(adc_repeat_count_t repeatCount)
+{
+    ADRPT = repeatCount;
+}
 
-    // Wait for the conversion to finish
-    while (!ADC_IsConversionDone())
+void ADC_UpperThresholdSet(adc_threshold_t upperThreshold)
+{
+    ADUTHH = (uint8_t) ((uint16_t)upperThreshold >> 8U);
+    ADUTHL = (uint8_t) upperThreshold;
+}
+
+void ADC_LowerThresholdSet(adc_threshold_t lowerThreshold)
+{
+    ADLTHH = (uint8_t) ((uint16_t)lowerThreshold >> 8U);
+    ADLTHL = (uint8_t) lowerThreshold;
+}
+
+adc_accumulate_t ADC_AccumulatedResultGet(void)
+{
+    return (adc_accumulate_t)(((uint32_t)ADACCU << 16) + ((uint32_t)ADACCH << 8) + ADACCL);
+}
+
+adc_result_t ADC_DifferentialChannelSelectAndConvert(adc_posChannel_t posChannel, adc_negChannel_t negChannel) 
+{
+    ADPCH = posChannel;
+    ADNCH = negChannel; 
+    ADCON0bits.ADCONT = ADC_BIT_CLEAR;
+
+    ADCON0bits.ADGO = ADC_BIT_SET;
+
+    while (true == ADCON0bits.ADGO)
     {
     }
     
-    // Conversion finished, return the result
-    result = ADC_GetConversionResult();
-    return result;
+    return ((adc_result_t)((ADRESH<< 8) + ADRESL));
 }
 
-inline uint8_t ADC_GetConversionStageStatus(void)
+void ADC_StopOnInterruptEnable(void)
 {
-    return ADSTATbits.ADSTAT;
+    ADCON3bits.ADSOI = ADC_BIT_SET;
 }
 
-inline void ADC_EnableContinuousConversion(void)
+void ADC_StopOnInterruptDisable(void)
 {
-    ADCON0bits.ADCONT = 1;
+    ADCON3bits.ADSOI = ADC_BIT_CLEAR;
 }
 
-inline void ADC_DisableContinuousConversion(void)
+void ADC_SampleCapacitorDischarge(void)
 {
-    ADCON0bits.ADCONT = 0;
+    ADPCH = ADC_POSCHANNEL_VSS;
+    ADNCH = ADC_NEGCHANNEL_VSS;
 }
 
-inline void ADC_SetStopOnInterrupt(void)
-{
-    ADCON3bits.ADSOI = 1;
-}
-
-inline void ADC_EnableDoubleSampling(void)
-{
-    ADCON1bits.ADDSEN = 1;
-}
-
-void ADC_SetAcquisitionRegister(uint16_t acquisitionValue)
+void ADC_AcquisitionTimeSet(uint16_t acquisitionValue)
 {
     ADACQH = (uint8_t)(acquisitionValue >> 8);
     ADACQL = (uint8_t)acquisitionValue;
 }
 
-void ADC_SetPrechargeRegister(uint16_t prechargeTime)
+void ADC_PrechargeTimeSet(uint16_t prechargeTime)
 {
     ADPREH = (uint8_t)(prechargeTime >> 8);
     ADPREL = (uint8_t)prechargeTime;
 }
-void ADC_DefineSetPoint(int16_t setPoint)
+
+adc_repeat_count_t ADC_CurrentConversionCountGet(void)
 {
-    ADSTPTH = (uint8_t)(((uint16_t)setPoint) >> 8);
-    ADSTPTL = (uint8_t)((uint16_t)setPoint);
+    return (adc_repeat_count_t)ADCNT;
 }
 
-void ADC_SetUpperThreshold(int16_t upperThreshold)
-{  
-    ADUTHH = (uint8_t)(((uint16_t)upperThreshold) >> 8);
-    ADUTHL = (uint8_t)((uint16_t)upperThreshold);
-}
-
-void ADC_SetLowerThreshold(int16_t lowerThreshold)
-{   
-    ADLTHH = (uint8_t)(((uint16_t)lowerThreshold) >> 8);
-    ADLTHL = (uint8_t)((uint16_t)lowerThreshold);
-}
-inline bool ADC_HasErrorCrossedUpperThreshold(void)
+void ADC_AccumulatorClear(void)
 {
-    return ADSTATbits.ADUTHR;
+    ADCON2bits.ADACLR = ADC_BIT_SET;
 }
 
-inline bool ADC_HasErrorCrossedLowerThreshold(void)
+bool ADC_IsAccumulatorClearComplete(void)
 {
-    return ADSTATbits.ADLTHR;
+    return ((bool)(!ADCON2bits.ADACLR));
 }
 
-inline void ADC_SetRepeatCount(uint8_t repeatCount)
-{
-    ADRPT = repeatCount;
-}
-
-inline uint8_t ADC_GetCurrentCountofConversions(void)
-{
-    return ADCNT;
-}
-
-inline int24_t ADC_GetAccumulatorValue(void)
-{
-    return  (((int24_t)ADACCU << 16) | ((int24_t)ADACCH << 8) | ADACCL);
-}
-
-inline void ADC_ClearAccumulator(void)
-{
-    ADCON2bits.ADACLR = 1;
-}
-
-inline bool ADC_HasAccumulatorOverflowed(void)
+bool ADC_HasAccumulatorOverflowed(void)
 {
     return ADSTATbits.ADAOV;
 }
 
-inline int16_t ADC_GetErrorCalculation(void)
+adc_result_t ADC_FilterValueGet(void)
 {
-    return ((int16_t) ((ADERRH << 8) | ADERRL));
+    return ((adc_result_t) ((ADFLTRH << 8) | ADFLTRL));
 }
 
-inline int16_t ADC_GetPreviousResult(void)
+adc_result_t ADC_PreviousResultGet(void)
 {
-    return ((int16_t) ((ADPREVH << 8) | ADPREVL));
+    return ((adc_result_t) ((ADPREVH << 8) | ADPREVL));
 }
 
-inline int16_t ADC_GetFilterValue(void)
+void ADC_SetPointDefine(adc_threshold_t setPoint)
 {
-    return ((int16_t) ((ADFLTRH << 8) | ADFLTRL));
+    ADSTPTH = (uint8_t)((uint16_t)setPoint >> 8U);
+    ADSTPTL = (uint8_t)setPoint;
+}
+
+adc_result_t ADC_ErrorCalculationGet(void)
+{
+    return ((adc_result_t) ((ADERRH << 8U) | ADERRL));
+}
+
+void ADC_DoubleSamplingEnable(void)
+{
+    ADCON1bits.ADDSEN = ADC_BIT_SET;
+}
+
+void ADC_DoubleSamplingDisable(void)
+{
+    ADCON1bits.ADDSEN = ADC_BIT_CLEAR;
+}
+
+void ADC_ContinuousConversionEnable(void)
+{
+    ADCON0bits.ADCONT = ADC_BIT_SET;
+}
+
+void ADC_ContinuousConversionDisable(void)
+{
+    ADCON0bits.ADCONT = ADC_BIT_CLEAR;
+}
+
+bool ADC_IsErrorGreaterThanUpperThreshold(void)
+{
+    return ADSTATbits.ADUTHR;
+}
+
+bool ADC_IsErrorLesserThanLowerThreshold(void)
+{
+    return ADSTATbits.ADLTHR;
+}
+
+adc_conversion_stage_t ADC_ConversionStageStatusGet(void)
+{
+    return ADSTATbits.ADSTAT;
+}
+
+void ADC_ErrorCalculationModeSet(adc_calculation_mode_t errorCalculationMode)
+{
+    ADCON3bits.ADCALC = errorCalculationMode;
+}
+
+void ADC_CalculationRightShiftSet(uint8_t rightShiftValue)
+{
+    ADCON2bits.ADCRS = rightShiftValue;
+}
+
+void ADC_ThresholdInterruptFlagClear(void)
+{
+    adc_context_t currentContext = ADCTX;
+    switch(currentContext)
+    {
+    case context_1:
+        PIR1bits.ADCH1IF = ADC_BIT_CLEAR;
+        break;
+    default:
+        PIR1bits.ADCH1IF = ADC_BIT_CLEAR;
+        break;
+    }
+}
+
+bool ADC_IsThresholdInterruptFlagSet(void)
+{
+    adc_context_t currentContext = ADCTX;
+    bool flagStatus = false;
+    switch(currentContext)
+    {
+    case context_1:
+        flagStatus = (bool)PIR1bits.ADCH1IF;
+        break;
+    default:
+        flagStatus = (bool)PIR1bits.ADCH1IF;
+        break;
+    }
+    return flagStatus;
+}
+
+void ADC_AutoTriggerSourceSet(adc_trigger_source_t triggerSource)
+{
+    ADACT = triggerSource;
+}
+
+uint8_t ADC_ResolutionGet(void)
+{
+    return ADC_RESOLUTION;
+}
+
+
+bool ADC_IsBusy(void)
+{
+    return adc_busy_status;
+}
+
+void ADC_BusyStatusSet(bool status)
+{
+    adc_busy_status = status;
+}
+
+void ADC_ConversionDoneInterruptFlagClear(void)
+{
+    PIR1bits.ADIF = ADC_BIT_CLEAR;
+}
+
+void ADC_Context1ThresholdInterruptFlagClear(void)
+{
+    PIR1bits.ADCH1IF = ADC_BIT_CLEAR;   
 }
 
 
 
 
+bool ADC_IsConversionDoneInterruptFlagSet(void)
+{
+    return PIR1bits.ADIF; 
+}
 
+bool ADC_IsContext1ThresholdInterruptFlagSet(void)
+{
+    return PIR1bits.ADCH1IF;
+}
+
+
+
+
+void ADC_ConversionDoneCallbackRegister(void (*callback)(void))
+{
+    ADC_ConversionDoneCallback = callback;
+}
+
+void ADC_ThresholdCallbackRegister(void (*callback)(void))
+{
+    adc_context_t currentContext = ADCTX;
+    switch(currentContext)
+    {
+    case context_1:
+        ADC_Context1ThresholdCallback = callback;
+        break;
+    default:
+        ADC_Context1ThresholdCallback = callback;
+        break;
+    }
+} 
+
+void ADC_Context1ThresholdCallbackRegister(void (*callback)(void))
+{
+    ADC_Context1ThresholdCallback = callback;
+} 
+
+
+
+
+void ADC_ChannelScanEnable(adc_context_t context)
+{
+    switch (context)
+    {
+    case context_1:
+        ADCSEL1bits.CHEN = ADC_BIT_SET;
+        break;
+    default:
+        ADCSEL1bits.CHEN = ADC_BIT_SET;
+        break;
+    }
+}
+
+void ADC_ChannelScanDisable(adc_context_t context)
+{
+    switch (context)
+    {
+    case context_1:
+        ADCSEL1bits.CHEN = ADC_BIT_CLEAR;
+        break;
+    default:
+        ADCSEL1bits.CHEN = ADC_BIT_CLEAR;
+        break;
+    }
+}
+
+void ADC_ChannelSequencerEnable(void)
+{
+    ADCON0bits.CSEN = ADC_BIT_SET;
+}
+
+void ADC_ChannelSequencerDisable(void)
+{
+    ADCON0bits.CSEN  = ADC_BIT_CLEAR;
+}
+
+void ADC_Tasks(void)
+{
+    if (1U == PIR1bits.ADIF)
+    {
+        PIR1bits.ADIF = ADC_BIT_CLEAR;
+        if (NULL != ADC_ConversionDoneCallback)
+        {
+            ADC_ConversionDoneCallback();
+        }
+        else
+        {
+            // Do nothing
+        }
+    }
+    else
+    {
+        // Do nothing
+    }
+    if (1U == PIR1bits.ADCH1IF)
+    {
+        PIR1bits.ADCH1IF = ADC_BIT_CLEAR;
+        if (NULL != ADC_Context1ThresholdCallback)
+        {
+            ADC_Context1ThresholdCallback();
+        }
+        else
+        {
+            // Do nothing
+        }
+    }
+    else
+    {
+        // Do nothing
+    }
+}

@@ -39,9 +39,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "config_bits.h"
-#include "../system/clock.h"
 #include "../system/pins.h"
-#include "../adc/adc.h"
 #include "../clc/clc1.h"
 #include "../clc/clc3.h"
 #include "../clc/clc6.h"
@@ -51,14 +49,17 @@
 #include "../dma/dma1.h"
 #include "../dma/dma2.h"
 #include "../dma/dma3.h"
-#include "../opa/opa1.h"
-#include "../opa/opa2.h"
+#include "../nvm/nvm.h"
 #include "../pwm/pwm1_16bit.h"
+#include "../pwm/pwm2_16bit.h"
 #include "../spi/spi1.h"
-#include "../timer/tmr0.h"
-#include "../timer/tmr4.h"
 #include "../uart/uart2.h"
 #include "../system/interrupt.h"
+#include "../system/clock.h"
+#include "../adc/adc.h"
+#include "../timer/tmr0.h"
+#include "../timer/tmr2.h"
+#include "../timer/tmr4.h"
 
 /**
  * @ingroup systemdriver

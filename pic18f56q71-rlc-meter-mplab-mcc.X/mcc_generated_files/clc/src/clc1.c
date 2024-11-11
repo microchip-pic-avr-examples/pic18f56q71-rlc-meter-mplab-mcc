@@ -7,7 +7,7 @@
  * 
  * @brief This file contains the API implementations for the CLC1 driver.
  *
- * @version CLC1 Driver Version 1.1.0
+ * @version CLC1 Driver Version 1.2.0
 */
 /*
 © [2024] Microchip Technology Inc. and its subsidiaries.
@@ -34,6 +34,9 @@
 #include <xc.h>
 #include "../clc1.h"
 
+
+static void (*CLC1_Callback)(void);
+static void CLC1_DefaultCallback(void);
 
 void CLC1_Initialize(void) 
 {
@@ -63,16 +66,70 @@ void CLC1_Initialize(void)
     // LCMODE AND-OR; LCINTN disabled; LCINTP enabled; LCEN enabled; 
     CLCnCON = 0x90;
 
+    //Set default callback for CLC1 interrupt Overflow.
+    CLC1_CallbackRegister(CLC1_DefaultCallback);
+
+    // Clear the CLC interrupt flag
+    PIR0bits.CLC1IF = 0;
 }
 
 void CLC1_Enable(void) 
 {
+    CLCSELECTbits.SLCT = 0;
     CLCnCONbits.EN = 1;
 }
 
 void CLC1_Disable(void) 
 {
+    CLCSELECTbits.SLCT = 0;
     CLCnCONbits.EN = 0;
+}
+
+void CLC1_RisingEdgeDetectionEnable(void) 
+{
+    CLCSELECTbits.SLCT = 0;
+    CLCnCONbits.INTP = 1;
+}
+
+void CLC1_RisingEdgeDetectionDisable(void) 
+{
+    CLCSELECTbits.SLCT = 0;
+    CLCnCONbits.INTP = 0;
+}
+
+void CLC1_FallingEdgeDetectionEnable(void) 
+{
+    CLCSELECTbits.SLCT = 0;
+    CLCnCONbits.INTN = 1;
+}
+
+void CLC1_FallingEdgeDetectionDisable(void) 
+{
+    CLCSELECTbits.SLCT = 0;
+    CLCnCONbits.INTN = 0;
+}
+
+void CLC1_CallbackRegister(void (* CallbackHandler)(void))
+{
+    CLC1_Callback = CallbackHandler;
+}
+
+static void CLC1_DefaultCallback(void)
+{
+    //Add your interrupt code here or
+    //Use CLC1_CallbackRegister function to use Custom ISR
+}
+
+void CLC1_Tasks(void)
+{
+    if(PIR0bits.CLC1IF == 1)
+    {
+        if(CLC1_Callback != NULL)
+        {
+            CLC1_Callback();
+        }
+        PIR0bits.CLC1IF = 0;
+    }
 }
 
 
