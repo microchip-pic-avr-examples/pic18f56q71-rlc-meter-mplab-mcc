@@ -7,7 +7,7 @@
 This repository contains an MPLAB® X project, a Resistance, Inductance, Capacitance (RLC) meter implementation using the internal resources of PIC18F56Q71 microcontroller.  
 In this code example, the PIC18F56Q71 microcontroller will be used to implement a RLC meter using the Analog-to-Digital Converter (ADC) with Computation and Context, Direct Memory Access (DMA), Timers (TMR0, TMR2, TMR4) and Configurable Logic Cell (CLC) peripherals. The sinusoidal waveform is generated using the Pulse-Width Modulator with Compare (PWM) and other peripherals on the device (DMA, timers). The measurement will be displayed using serial protocols.
 
-Note: This project is not an measurement instrument, it was developed only for educational purpose.
+**Note**: This project is not an measurement instrument, it was developed only for educational purpose.
 
 ## Related Documentation
 - [PIC18F56Q71 Product Page](https://www.microchip.com/en-us/product/PIC18F56Q71?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q71&utm_content=pic18f56q71-rlc-meter-mplab-mcc-github&utm_bu=MCU08)
@@ -25,7 +25,7 @@ Note: This project is not an measurement instrument, it was developed only for e
 - The [PIC18F56Q71 Curiosity Nano Development board](https://www.microchip.com/en-us/development-tool/EV01G21A?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q71&utm_content=pic18f56q71-rlc-meter-mplab-mcc-github&utm_bu=MCU08) is used as a test platform:
     <br><img src="images/pic18f56q71-curiosity-nano-board.png" width="600">
 
-- [Curiosity Nano Adaptor](https://www.microchip.com/en-us/development-tool/ac164162)
+- [Curiosity Nano Adaptor](https://www.microchip.com/en-us/development-tool/AC164162?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q71&utm_content=pic18f56q71-rlc-meter-mplab-mcc-github&utm_bu=MCU08)
     <br><img src="images/curiosity-nano-adapter.png" width="600">
 
 - [OLED C CLICK Board](https://www.mikroe.com/oled-c-click#/263-clickid-yes) (mikroBUS socket 3)
@@ -55,6 +55,7 @@ This demo uses an auto-balancing bridge which is the measurement circuit in many
 ### Sinusoidal Waveform Generation
 
 The sinusoidal waveform is generated using the PWM2 peripheral. The PWM duty-cycle is updated using a sine Look-Up Table (LUT) that is stored into the Flash Program memory (const uint8_t waveROM250[250]). The resulted waveform is then filtered using an external low-pass filter to obtain the sinusoidal signal. To ensure precise timing for each sample, a DMA channel (DMA2) triggered by CLC1 is used to transfer data from the sine table to PWM2. The PWM2 frequency is set to 1 MHz, meaning that for the maximum frequency of the resulted sine wave of 1 KHz, the PWM duty-cycle is updated in 250 steps at every four PWM periods, ensuring a stable output. The generated sinusoidal signal frequency can easily be modified by changing the number of PWM periods after the duty-cycle is updated. This is done by changing the TMR0 period with the formula below. The multiplication with the `2` factor is done because the TMR0 output is used in a Divide-by-Two circuit implemented with the CLC8 peripheral.
+
 <br><img src="images/sine_freq_formula.png" width="160">
 
 <br><img src="images/sine_wave_generation.png" width="1000">
@@ -63,13 +64,13 @@ The sine wave frequency can be modified in the program using the `FREQ` macro. T
 
 ### Measurement board
 
-The measurement circuit is realised on a board that can be used on a mikroBus socket. The entire schematic and Gerber files of the board can be found in the `Board Documents` folder.
+The measurement circuit is realised on a board that can be used on a mikroBUS™ socket. The entire schematic and Gerber files of the board can be found in the `Board Documents` folder.
 
 The following image shows the schematic of the low-pass filter and auto-balancing bridge. A [MCP6022](https://www.microchip.com/en-us/product/mcp6022) is used for the two OPAMPs. The first one is used for the filter that generates the sine wave from the PWM signal. The second one implements the automatic balanced bridge that was mentioned above. The device under test (DUT) is connected in the circuit using the J1 connector.
 <br><img src="images/board_schematic.png" width="1000">
-<br>*Note:* The R18 resistor is not connected on the board.
+<br>**Note:** The R18 resistor is not connected on the board.
 
-The selection between the current and voltage aquisition is done using two [MCP6S26](https://www.microchip.com/en-us/product/mcp6s26) PGAs that have an internal multiplexer used to select between the six possible inputs. The PGAs multiplexers for input and gain selection can be programmed using the SPI interface and they are connected in a daisy-chain configuration. The two PGAs have multiple inputs conected for different configuration of the circuit. The following configuration is used for this application:
+The selection between the current and voltage acquisition is done using two [MCP6S26](https://www.microchip.com/en-us/product/mcp6s26) PGAs that have an internal multiplexer used to select between the six possible inputs. The PGAs multiplexers for input and gain selection can be programmed using the Serial Peripheral Interface (SPI) and they are connected in a daisy-chain configuration. The two PGAs have multiple inputs connected for different configurations of the circuit. The following configuration is used for this application:
 
 |**Measurement**|**PGA1 (U2) Channel**|**PGA2 (U3) Channel**| 
 | :-------:     | :-----------------: | :-----------------: |
@@ -77,35 +78,35 @@ The selection between the current and voltage aquisition is done using two [MCP6
 |    Voltage    |         CH1         |         CH2         |  
 
 <br><img src="images/board_schematic_pga.png" width="1000">
-<br>*Note:* The R17 resistor offers the possibility to connect the VREF of the two PGAs together (R17 not connected) or to the board VREF (R17 connected). In this case the R17 resistor is connected.
+<br>**Note:** The R17 resistor offers the possibility to connect the VREF of the two PGAs together (R17 not connected) or to the board VREF (R17 connected). In this case, the R17 resistor is connected.
 
 A second [MCP6022](https://www.microchip.com/en-us/product/mcp6022) is used for the VREF signal and to obtain the output signal. The VREF is set to VDD/2, meaning 1.65 V. The second OPAMP is used in differential to single-ended configuration to obtain a single output from the two PGAs that is used for the ADC input.
 <br><img src="images/board_schematic_output.png" width="1000">
 
 The board is used at 3.3 V. The power source can be selected using the R20 and R21 resistors. By connecting the R20 resistor, the board is powered from the 3V3 pin on the mikroBus socket. By connecting the R21 resistor, the board is powered from an external LDO (such as [MCP1700](https://www.microchip.com/en-us/product/mcp1700)) that is connected to the 5V pin on the mikroBus socket and offers 3V3 output.
 <br><img src="images/board_schematic_power.png" width="1000">
-<br>*Note:* Just one resistor (R20 or R21) should be connected on the board. R20 resistor is connected on the presented one.
+<br>**Note:** Just one resistor (R20 or R21) must be connected on the board. R20 resistor is connected on the presented one.
 
 
 ### Synchronization Between the Generated Signal and the Data Acquired
 
-To allow accurate values for computed impedance, the aquisition of the samples for current and voltage must be synchronized with input signal (generated waveform). The synchronization between generated waveform and aquired samples is done using on-chip peripherals like CLCs, Pulse-Width Modulation (PWM) and timers:
+To allow accurate values for computed impedance, the acquisition of the samples for current and voltage must be synchronized with input signal (generated waveform). The synchronization between generated waveform and acquired samples is done using on-chip peripherals like CLCs, Pulse-Width Modulation (PWM) and timers:
 <br><img src="images/logic_diagram.png" width="1000">
 
-The TMR4 peripheral is used for oversampling in order to increse the aquiring rate of the waveform. The sampling rate can be configured using the `TIMESAMPLING_RATE` macro.
+The TMR4 peripheral is used for oversampling to increase the acquiring rate of the waveform. The sampling rate can be configured using the `TIMESAMPLING_RATE` macro.
 
-### Waveform aquisition
+### Waveform Acquisition
 
-The MCP6S26 input multiplexer is used to select between the current and voltage aquisition. For an impedance measurement, two of those aquisitions are performed starting with the voltage one. For both of them, the samples are saved in different buffers using alternatively DMA1/DMA3 peripherals. To calculate the real and imaginary parts for voltage and current, the processed data is mutiplied by cosinus wave and sinus wave, respectively. The results are then scaled using the gain values. The DAC1 peripheral is used to eliminate the DC component of the signal.
+The MCP6S26 input multiplexer is used to select between the current and voltage acquisition. For an impedance measurement, two of those acquisitions are performed starting with the voltage one. For both of them, the samples are saved in different buffers using alternatively DMA1/DMA3 peripherals. To calculate the real and imaginary parts for voltage and current, the processed data is multiplied by cosinus wave and sinus wave, respectively. The results are then scaled using the gain values. The DAC1 peripheral is used to eliminate the DC component of the signal.
 
-Using of oversampling means that more periods of the sinusoidal signal are used for the aquisition (the number is equal to the time sampling rate) and the samples are not aquired in order for a reconstruction of a single sine wave. To calculate the real and imaginary parts described above, the aquired samples are read in the order of aquisition and the corresponding cosinus/sinus value for each sample is determined based on the chosen sampling rate. 
-<br><img src="images/aquisition_diagram.png" width="1000">
+The usage of oversampling means that more periods of the sinusoidal signal are used for the acquisition (the number is equal to the time sampling rate) and the samples are not acquired in order for a reconstruction of a single sine wave. To calculate the real and imaginary parts described above, the acquired samples are read in the order of acquisition and the corresponding cosinus/sinus value for each sample is determined based on the chosen sampling rate. 
+<br><img src="images/acquisition_diagram.png" width="1000">
 
 ### Calibration and Auto Gain
 
-The MCP6S26 gain selection multiplexer is used to implement an auto gain algorithm when a new component is inserted to independently determine the right gain for voltage and current measurements. The principle is to adjust the gain in order to obtain the maximum amplification that does not saturate the output. The maximum value for voltage is determined when the DUT is not connected and for the current by measuring in short circuit. The measured values are than increased with 40%. The values used for comparisons in the algorithm are the raw read data, that are not scaled using the gain factor.
+The MCP6S26 gain selection multiplexer is used to implement an auto gain algorithm when a new component is inserted to independently determine the right gain for voltage and current measurements. The principle is to adjust the gain to obtain the maximum amplification that does not saturate the output. The maximum value for voltage is determined when the DUT is not connected and for the current by measuring in short circuit. The measured values are then increased with 40%. The values used for comparisons in the algorithm are the raw read data, that are not scaled using the gain factor.
 
-The maximum values are automaticaly determined using a calibration process and the determined values are than stored into the on-board EEPROM by using the Nonvolatile Memory Module (NVM) peripheral. This way, when the application is started, it verifies if there are calibration data stored in EEPROM by reading and verifing a byte that is stored at a known address. If the calibration data are available, they are read, stored in variables and used in the auto gain algorithm described above. If they are not available, the user can start the calibration for voltage and current by short pressing the on-board button and following the displayed instructions. User can also begin the calibration process when the application is already running with a long press of the button. TMR2 peripheral is used for detection of the short and long press of the button.
+The maximum values are automaticaly determined using a calibration process and the determined values are then stored into the on-board EEPROM by using the Nonvolatile Memory Module (NVM) peripheral. This way, when the application is started, it verifies if there are calibration data stored in EEPROM by reading and verifying a byte that is stored at a known address. If the calibration data are available, they are read, stored in variables and used in the auto gain algorithm described above. If they are not available, the user can start the calibration for voltage and current by short pressing the on-board button and following the displayed instructions. The user can also begin the calibration process when the application is already running with a long press of the button. TMR2 peripheral is used for detection of the short and long press of the button.
  
 ## Setup
 
