@@ -25,7 +25,7 @@ In this code example, the PIC18F56Q71 microcontroller will be used to implement 
 - The [PIC18F56Q71 Curiosity Nano Development board](https://www.microchip.com/en-us/development-tool/EV01G21A?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q71&utm_content=pic18f56q71-rlc-meter-mplab-mcc-github&utm_bu=MCU08) is used as a test platform:
     <br><img src="images/pic18f56q71-curiosity-nano-board.png" width="600">
 
-- [Curiosity Nano Adaptor](https://www.microchip.com/en-us/development-tool/AC164162?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q71&utm_content=pic18f56q71-rlc-meter-mplab-mcc-github&utm_bu=MCU08																)
+- [Curiosity Nano Adaptor](https://www.microchip.com/en-us/development-tool/AC164162?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q71&utm_content=pic18f56q71-rlc-meter-mplab-mcc-github&utm_bu=MCU08)
     <br><img src="images/curiosity-nano-adapter.png" width="600">
 
 - [OLED C CLICK Board](https://www.mikroe.com/oled-c-click#/263-clickid-yes) (mikroBUS socket 3)
