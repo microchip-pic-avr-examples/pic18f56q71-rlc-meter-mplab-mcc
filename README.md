@@ -25,7 +25,7 @@ In this code example, the PIC18F56Q71 microcontroller will be used to implement 
 - The [PIC18F56Q71 Curiosity Nano Development board](https://www.microchip.com/en-us/development-tool/EV01G21A?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q71&utm_content=pic18f56q71-rlc-meter-mplab-mcc-github&utm_bu=MCU08) is used as a test platform:
     <br><img src="images/pic18f56q71-curiosity-nano-board.png" width="600">
 
-- [Curiosity Nano Adaptor](https://www.microchip.com/en-us/development-tool/AC164162?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q71&utm_content=pic18f56q71-rlc-meter-mplab-mcc-github&utm_bu=MCU08)
+- [Curiosity Nano Adaptor](https://www.microchip.com/en-us/development-tool/AC164162?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q71&utm_content=pic18f56q71-rlc-meter-mplab-mcc-github&utm_bu=MCU08																)
     <br><img src="images/curiosity-nano-adapter.png" width="600">
 
 - [OLED C CLICK Board](https://www.mikroe.com/oled-c-click#/263-clickid-yes) (mikroBUS socket 3)
@@ -66,11 +66,11 @@ The sine wave frequency can be modified in the program using the `FREQ` macro. T
 
 The measurement circuit is realised on a board that can be used on a mikroBUS™ socket. The entire schematic and Gerber files of the board can be found in the `Board Documents` folder.
 
-The following image shows the schematic of the low-pass filter and auto-balancing bridge. A [MCP6022](https://www.microchip.com/en-us/product/mcp6022) is used for the two OPAMPs. The first one is used for the filter that generates the sine wave from the PWM signal. The second one implements the automatic balanced bridge that was mentioned above. The device under test (DUT) is connected in the circuit using the J1 connector.
+The following image shows the schematic of the low-pass filter and auto-balancing bridge. A [MCP6022](https://www.microchip.com/en-us/product/mcp6022?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q71&utm_content=pic18f56q71-rlc-meter-mplab-mcc-github&utm_bu=MCU08) is used for the two OPAMPs. The first one is used for the filter that generates the sine wave from the PWM signal. The second one implements the automatic balanced bridge that was mentioned above. The device under test (DUT) is connected in the circuit using the J1 connector.
 <br><img src="images/board_schematic.png" width="1000">
 <br>**Note:** The R18 resistor is not connected on the board.
 
-The selection between the current and voltage acquisition is done using two [MCP6S26](https://www.microchip.com/en-us/product/mcp6s26) PGAs that have an internal multiplexer used to select between the six possible inputs. The PGAs multiplexers for input and gain selection can be programmed using the Serial Peripheral Interface (SPI) and they are connected in a daisy-chain configuration. The two PGAs have multiple inputs connected for different configurations of the circuit. The following configuration is used for this application:
+The selection between the current and voltage acquisition is done using two [MCP6S26](https://www.microchip.com/en-us/product/mcp6s26?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q71&utm_content=pic18f56q71-rlc-meter-mplab-mcc-github&utm_bu=MCU08) PGAs that have an internal multiplexer used to select between the six possible inputs. The PGAs multiplexers for input and gain selection can be programmed using the Serial Peripheral Interface (SPI) and they are connected in a daisy-chain configuration. The two PGAs have multiple inputs connected for different configurations of the circuit. The following configuration is used for this application:
 
 |**Measurement**|**PGA1 (U2) Channel**|**PGA2 (U3) Channel**| 
 | :-------:     | :-----------------: | :-----------------: |
@@ -80,10 +80,10 @@ The selection between the current and voltage acquisition is done using two [MCP
 <br><img src="images/board_schematic_pga.png" width="1000">
 <br>**Note:** The R17 resistor offers the possibility to connect the VREF of the two PGAs together (R17 not connected) or to the board VREF (R17 connected). In this case, the R17 resistor is connected.
 
-A second [MCP6022](https://www.microchip.com/en-us/product/mcp6022) is used for the VREF signal and to obtain the output signal. The VREF is set to VDD/2, meaning 1.65 V. The second OPAMP is used in differential to single-ended configuration to obtain a single output from the two PGAs that is used for the ADC input.
+A second [MCP6022](https://www.microchip.com/en-us/product/mcp6022?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q71&utm_content=pic18f56q71-rlc-meter-mplab-mcc-github&utm_bu=MCU08) is used for the VREF signal and to obtain the output signal. The VREF is set to VDD/2, meaning 1.65 V. The second OPAMP is used in differential to single-ended configuration to obtain a single output from the two PGAs that is used for the ADC input.
 <br><img src="images/board_schematic_output.png" width="1000">
 
-The board is used at 3.3 V. The power source can be selected using the R20 and R21 resistors. By connecting the R20 resistor, the board is powered from the 3V3 pin on the mikroBus socket. By connecting the R21 resistor, the board is powered from an external LDO (such as [MCP1700](https://www.microchip.com/en-us/product/mcp1700)) that is connected to the 5V pin on the mikroBus socket and offers 3V3 output.
+The board is used at 3.3 V. The power source can be selected using the R20 and R21 resistors. By connecting the R20 resistor, the board is powered from the 3V3 pin on the mikroBus socket. By connecting the R21 resistor, the board is powered from an external LDO (such as [MCP1700](https://www.microchip.com/en-us/product/mcp1700?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q71&utm_content=pic18f56q71-rlc-meter-mplab-mcc-github&utm_bu=MCU08)) that is connected to the 5V pin on the mikroBus socket and offers 3V3 output.
 <br><img src="images/board_schematic_power.png" width="1000">
 <br>**Note:** Just one resistor (R20 or R21) must be connected on the board. R20 resistor is connected on the presented one.
 
@@ -200,6 +200,8 @@ The following peripheral and clock configurations are set up using the MPLAB Cod
     - Negative Channel Selection: DAC1
     - Negative Voltage Reference: VSS
     - Computation mode: Basic_mode
+    - Threshold Interrupt Mode: Enabled
+    - Upper Threshold: 1
     <br><img src="images/mcc_adc_context1_1.png" width="600">
 
 8. TMR0
@@ -321,16 +323,16 @@ The following peripheral and clock configurations are set up using the MPLAB Cod
     <br><img src="images/mcc_pins.png" width="600">
 
 | Pin | Configuration  |          Description         | Custom name |
-| :-: | :------------: | :--------------------------: |-------------|
-| RD6 |  Analog output |        CLC3 output           |             |
-| RC6 | Digital output |          SPI1 SCK            |             |
-| RC5 | Digital input  |          SPI1 SDI            |             |
-| RC2 | Digital output |          SPI1 SDO            |             |
-| RB0 | Analog output  |          PWM2OUT1            |             |
-| RF2 | Analog output  |          PWM1OUT1            |             |
-| RB5 | Digital input  |          UART2 RX            |             |
-| RB4 | Digital output |          UART2 TX            |             |
-| RA1 |  Analog input  |  ADC positive input channel  |             |
+| :-: | :------------: | :--------------------------: |:-----------:|
+| RD6 |  Analog output |        CLC3 output           |      -      |
+| RC6 | Digital output |          SPI1 SCK            |      -      |
+| RC5 | Digital input  |          SPI1 SDI            |      -      |
+| RC2 | Digital output |          SPI1 SDO            |      -      |
+| RB0 | Analog output  |          PWM2OUT1            |      -      |
+| RF2 | Analog output  |          PWM1OUT1            |      -      |
+| RB5 | Digital input  |          UART2 RX            |      -      |
+| RB4 | Digital output |          UART2 TX            |      -      |
+| RA1 |  Analog input  |  ADC positive input channel  |      -      |
 | RA0 | Digital input  |      Button input pin        |   BUTTON    |
 | RA4 | Digital output |      OLED board RW pin       |  oledC_RW   |
 | RA5 | Digital output |    RLC Meter board CS pin    |   RLC_CS    |
@@ -340,15 +342,18 @@ The following peripheral and clock configurations are set up using the MPLAB Cod
 | RF4 | Digital output |      OLED board EN pin       |  oledC_EN   | 
 | RF5 | Digital output |      OLED board RST pin      |  oledC_RST  | 
 | RF7 | Digital output |      OLED board CS pin       |  oledC_nCS  | 
-| RW0 | Digital input  |      CLC8IN0 / CLC3IN0       |             |
-| RW1 | Digital input  |           CLC6IN1            |             |
-| RW2 | Digital input  |           CLC7IN2            |             | 
+| RW0 | Digital input  |      CLC8IN0 / CLC3IN0       |      -      |
+| RW1 | Digital input  |           CLC6IN1            |      -      |
+| RW2 | Digital input  |           CLC7IN2            |      -      | 
 
 ## Demo
 
 In order to demonstrate the capabilities of this application, a 1 μF capacitor measurement was performed. The result can be seen in the following picture.
 
 <br><img src="images/capacitor_1u.jpg" width="600">
+
+The result can also be visualised in [MPLAB Data Visualizer](https://www.microchip.com/en-us/tools-resources/debug/mplab-data-visualizer?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_PIC18-Q71&utm_content=pic18f56q71-rlc-meter-mplab-mcc-github&utm_bu=MCU08).
+<br><img src="images/capacitor_1u_dv.jpg" width="600">
 
 ## Summary
 
